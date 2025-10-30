@@ -13,8 +13,8 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
   // Default navigation setup based on user role
   useEffect(() => {
     const baseNav = [
-      { id: "dashboard", label: "Dashboard", icon: <FaHome />, route: "/" },
-      { id: "chat", label: "Chat", icon: <FaComments />, route: "/chat" },
+      { id: "dashboard", label: "About", icon: <FaHome />, route: "/" },
+      { id: "chat", label: "Tutorial", icon: <FaComments />, route: "/chat" },
     ];
 
     if (user?.labels?.includes("admin")) {
@@ -42,7 +42,6 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
                 href={item.route}
                 className="flex items-center space-x-2 hover:text-blue-400 transition-colors"
               >
-                {item.icon}
                 <span>{item.label}</span>
               </Link>
             </li>
@@ -55,7 +54,7 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
       </nav>
 
       {/* Main Content Area */}
-      <main className="flex-1 p-6 overflow-auto bg-gray-50 dark:bg-gray-900">
+      <main className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900">
         {children}
       </main>
     </div>

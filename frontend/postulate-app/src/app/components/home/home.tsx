@@ -1,27 +1,38 @@
-import ClientProfileListing from "../clientProfile/clientProfileListing";
-import SessionListing from "../session/sessionListing";
+import GetStarted from "./getStarted";
+import Tutorial from "./tutorial";
+import UseCase from "./useCase";
+import Footer from "./footer";
 
 export default function Home() {
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h2 className="font-semibold">Total Sessions</h2>
-          <p className="text-3xl">1,234</p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h2 className="font-semibold">Successful Sessions</h2>
-          <p className="text-3xl">5</p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h2 className="font-semibold">Failed Sessions</h2>
-          <p className="text-3xl">23</p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Hero Section */}
+        <section className="text-center mb-16 mt-8">
+          <h1 className="text-4xl md:text-6xl font-bold text-gray-800 mb-6">
+            Elevate Research Papers with <br></br> <span className="text-blue-600">AI Peer Reviewer</span>
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-10">
+            We help researchers clearly articulate why their work matters - the difference between acceptance and rejection.
+          </p>
+          <div className="text-center mt-10">
+            <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-full transition-colors">
+              Get Started
+            </button>
+          </div>
+        </section>
+        {/* Use Cases Section */}
+        <section className="mb-16">
+          <UseCase />
+        </section>
+
+        {/* Tutorial Section */}
+        <section className="mb-16">
+          <Tutorial />
+        </section>
       </div>
-      <div className="p-4">
-        <SessionListing />
-      </div>
+        {/* Footer */}
+        <Footer />
     </div>
   );
 }
