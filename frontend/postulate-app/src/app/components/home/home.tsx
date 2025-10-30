@@ -1,9 +1,18 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import GetStarted from "./getStarted";
 import Tutorial from "./tutorial";
 import UseCase from "./useCase";
 import Footer from "./footer";
 
 export default function Home() {
+  const router = useRouter();
+
+  const handleGetStarted = () => {
+    router.push("/copilotWorkflow");
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="max-w-6xl mx-auto px-4 py-8">
@@ -16,7 +25,10 @@ export default function Home() {
             We help researchers clearly articulate why their work matters - the difference between acceptance and rejection.
           </p>
           <div className="text-center mt-10">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-full transition-colors">
+            <button 
+              onClick={handleGetStarted}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-full transition-colors"
+            >
               Get Started
             </button>
           </div>
