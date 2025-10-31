@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useStateController } from "./context/stateController";
 import { useUser } from "./context/userContext";
 import Link from "next/link";
@@ -9,6 +10,7 @@ import { FaHome, FaComments, FaUsersCog } from "react-icons/fa";
 export default function LayoutClient({ children }: { children: React.ReactNode }) {
   const { navItems, setNavItems } = useStateController();
   const { user } = useUser();
+  const router = useRouter();
 
   // Default navigation setup based on user role
   useEffect(() => {
@@ -33,7 +35,13 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
     <div className="flex flex-col min-h-screen">
       {/* Top Bar */}
       <nav className="bg-gray-800 text-white px-6 py-3 flex items-center justify-between shadow-md">
-        <div className="text-2xl font-bold">Postulate</div>
+        {/* Clickable title */}
+        <div
+          className="text-2xl font-bold cursor-pointer hover:text-blue-400 transition-colors"
+          onClick={() => router.push("/")}
+        >
+          Postulate
+        </div>
 
         <ul className="flex space-x-6">
           {navItems.map((item) => (
@@ -48,9 +56,7 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
           ))}
         </ul>
 
-        <div className="text-sm">
-          {user ? user.name : "Guest"}
-        </div>
+        <div className="text-sm">{user ? user.name : "Guest"}</div>
       </nav>
 
       {/* Main Content Area */}

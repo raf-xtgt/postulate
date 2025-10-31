@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import GetStarted from "./getStarted";
 import Tutorial from "./tutorial";
 import UseCase from "./useCase";
 import Footer from "./footer";

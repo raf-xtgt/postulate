@@ -60,7 +60,7 @@ export default function Editor() {
                     className="flex-grow p-2 focus:outline-none"
                     suppressContentEditableWarning={true}
                 >
-                    Start writing your document here...
+                    
                 </div>
                 {tooltip.visible && (
                     <div
