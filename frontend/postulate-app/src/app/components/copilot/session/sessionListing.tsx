@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { FaPlus } from 'react-icons/fa';
 import { SessionModel } from '@/app/models/session';
 import AddSession from './addSession';
+import LibraryListing from '../library/libraryListing';
 
 export default function SessionListing() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -125,7 +126,7 @@ export default function SessionListing() {
 
             {/* Chats Section */}
             <div className="p-4 flex-1 overflow-y-auto">
-              Library
+              <LibraryListing></LibraryListing>
             </div>
 
           </div>
