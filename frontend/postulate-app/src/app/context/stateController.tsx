@@ -1,6 +1,7 @@
 "use client";
 import { createContext, useContext, useState, ReactNode } from 'react';
 import { ChatMessage } from '../models/chatMsg';
+import { CitationModel } from '../models/citation';
 
 interface NavItem {
   id: string;
@@ -25,6 +26,8 @@ interface StateControllerState {
   setNavItems: (items: NavItem[]) => void;
   docText: string;
   addDocText: (docText: string) => void;
+  citations: CitationModel[];
+  addCitation: (citation: CitationModel) => void;
 
 }
 
@@ -39,6 +42,7 @@ export const StateControllerProvider = ({ children }: { children: ReactNode }) =
   //new
   const [navItems, setNavItems] = useState<NavItem[]>([]);
   const [docText, addDocText] = useState<string>("");
+  const [citations, setCitations] = useState<CitationModel[]>([]);
 
   const addChatMessage = (message: ChatMessage) => {
     setChatMessages(prev => [...prev, message]);
@@ -46,6 +50,10 @@ export const StateControllerProvider = ({ children }: { children: ReactNode }) =
 
   const pruneChatMessages = (index: number) => {
     setChatMessages(prev => prev.slice(0, index + 1));
+  };
+
+  const addCitation = (citation: CitationModel) => {
+    setCitations(prev => [...prev, citation]);
   };
 
   return (
@@ -64,7 +72,9 @@ export const StateControllerProvider = ({ children }: { children: ReactNode }) =
       navItems,
       setNavItems,
       docText,
-      addDocText
+      addDocText,
+      citations,
+      addCitation
     }}>
       {children}
     </StateControllerContext.Provider>

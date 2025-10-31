@@ -1,23 +1,22 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useStateController } from '@/app/context/stateController';
+import CitationCard from './citationCard';
 
 export default function Citation() {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [search, setSearch] = useState("");
+    const { citations } = useStateController();
 
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-
-    // Load Sessions on component mount
-    useEffect(() => {
-    }, []);
-
-      return (
-        <div>
-            <h1 className="text-2xl font-bold mb-4">Citation</h1>
-
+    return (
+        <div className="flex-1 overflow-auto p-4">
+            {citations.length === 0 && <div className="text-sm text-gray-500">No citations yet. Highlight text in the editor to add one.</div>}
+            <div className="space-y-4">
+              {citations?.map((citation, idx) => (
+                <CitationCard
+                  key={`citation-${idx}`}
+                  citation={citation}
+                />
+              ))}
+            </div>
        </div>
-        
-      );
-  }
+    );
+}

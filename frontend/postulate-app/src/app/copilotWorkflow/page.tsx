@@ -1,6 +1,7 @@
 "use client";
 import SessionListing from "../components/copilot/session/sessionListing";
 import LlmMain from "../components/copilot/llmComponents/llmMain";
+import Editor from "../components/copilot/editor/editor";
 
 export default function CopilotWorkflow() {
 
@@ -15,8 +16,7 @@ export default function CopilotWorkflow() {
         
         {/* Main Chat Content Area - adjusted width */}
         <div className="hidden md:block md:w-3/5 bg-white rounded-lg shadow">
-        <h1 className="text-2xl font-bold mb-4">Writing Editor</h1>
-          
+          <Editor />
         </div>
 
         
