@@ -19,8 +19,13 @@ interface StateControllerState {
   setReplayMessage: (message: string) => void;
   replayAltPath: any;
   setReplayAltPath: (payload: any) => void;
+
+  // new
   navItems: NavItem[];
   setNavItems: (items: NavItem[]) => void;
+  docText: string;
+  addDocText: (docText: string) => void;
+
 }
 
 const StateControllerContext = createContext<StateControllerState | undefined>(undefined);
@@ -30,7 +35,10 @@ export const StateControllerProvider = ({ children }: { children: ReactNode }) =
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [replayMessage, setReplayMessage] = useState<string>("");
   const [replayAltPath, setReplayAltPath] = useState<any>(null);
+
+  //new
   const [navItems, setNavItems] = useState<NavItem[]>([]);
+  const [docText, addDocText] = useState<string>("");
 
   const addChatMessage = (message: ChatMessage) => {
     setChatMessages(prev => [...prev, message]);
@@ -51,8 +59,12 @@ export const StateControllerProvider = ({ children }: { children: ReactNode }) =
       setReplayMessage,
       replayAltPath,
       setReplayAltPath,
+
+      // new
       navItems,
-      setNavItems
+      setNavItems,
+      docText,
+      addDocText
     }}>
       {children}
     </StateControllerContext.Provider>
