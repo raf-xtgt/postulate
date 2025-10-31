@@ -42,15 +42,27 @@ export default function LibraryListing() {
       setLibraryDocs(libraryDocs)
     }, []);
 
-    const handleAddLibraryDoc = async (newCustomer: any) => {
-        try {
+    const handleAddLibraryDoc = async (files: File[]) => {
+    try {
         setLoading(true);
-        } catch (err) {
-        setError('Failed to create cp');
+        console.log('Uploading files:', files);
+
+        const newDocs: LibraryModel[] = files.map((file, index) => ({
+            guid: `new-${libraryDocs.length + index}-${Date.now()}`,
+            file_guid: `file-guid-${libraryDocs.length + index}`,
+            file_name: file.name,
+            created_date: new Date().toISOString(),
+            last_update: new Date().toISOString(),
+        }));
+
+        setLibraryDocs(prevDocs => [...prevDocs, ...newDocs]);
+        setError(null);
+    } catch (err) {
+        setError('Failed to upload files');
         console.error(err);
-        } finally {
+    } finally {
         setLoading(false);
-        }
+    }
     };
   
 
