@@ -3,11 +3,7 @@
 import { useState, useEffect } from 'react';
 
 export default function Editor() {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [search, setSearch] = useState("");
-
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [docText, setDocText] = useState("");
 
     // Load Sessions on component mount
     useEffect(() => {

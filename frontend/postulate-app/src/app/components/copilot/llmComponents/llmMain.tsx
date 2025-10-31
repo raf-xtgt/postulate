@@ -1,16 +1,10 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import Citation from './citation/citation';
 
 export default function LlmMain() {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [search, setSearch] = useState("");
-
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-
-    // Load Sessions on component mount
+   
     useEffect(() => {
     }, []);
 
