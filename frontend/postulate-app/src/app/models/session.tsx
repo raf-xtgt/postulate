@@ -1,15 +1,8 @@
-import { ClientAgentContextModel } from "./clientAgent";
 
 export interface SessionModel {
-    session_id: string;
-    client_agent_context: ClientAgentContextModel;
-    round_count: number;
+    guid: string;
+    title: string;
+    created_date: string;
+    last_update: string;
   }
-  
-
-export enum SessionOutcomeEnum {
-  IN_PROGRESS = "In Progress",
-  SUCCESS = "Success",
-  FAILED = "Failed",
-}
   
