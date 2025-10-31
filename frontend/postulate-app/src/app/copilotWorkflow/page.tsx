@@ -1,5 +1,6 @@
 "use client";
 import SessionListing from "../components/copilot/session/sessionListing";
+import LlmMain from "../components/copilot/llmComponents/llmMain";
 
 export default function CopilotWorkflow() {
 
@@ -21,6 +22,7 @@ export default function CopilotWorkflow() {
         
         <div className="hidden md:block md:w-1/5 bg-white rounded-lg shadow">
           <h1 className="text-2xl font-bold mb-4">AI</h1>
+          <LlmMain></LlmMain>
         </div>
         
       </div>
