@@ -19,7 +19,7 @@ const initialFormData: SessionModel = {
 export default function AddSession({ isOpen, onClose, onSave }: AddSessionModalProps) {
   const [formData, setFormData] = useState<SessionModel>(initialFormData);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -60,15 +60,16 @@ export default function AddSession({ isOpen, onClose, onSave }: AddSessionModalP
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                <input
-                  type="text"
-                  name="org"
+                <textarea
+                  name="description"
                   value={formData.description}
                   onChange={handleChange}
-                  className="w-full p-2 border border-gray-300 rounded-md"
+                  className="w-full p-2 border border-gray-300 rounded-md resize-y min-h-[100px]"
+                  placeholder="Enter a detailed description..."
                   required
-                />
+                ></textarea>
               </div>
+
             </div>
             <div className="flex justify-end space-x-3">
               <button
