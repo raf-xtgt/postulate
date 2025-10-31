@@ -53,19 +53,33 @@ export default function Pitfall() {
       }, []);
 
   return (
-    <div className="flex-1 overflow-auto p-4">
-        {loading && <div className="text-sm text-gray-500">Loading checkpoints…</div>}
-        {error && <div className="text-sm text-red-600">Error: {error}</div>}
+    <div className="flex-1 overflow-auto p-4 bg-gray-50">
+        {loading && (
+            <div className="flex justify-center items-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500"></div>
+            </div>
+        )}
+        {error && (
+            <div className="bg-red-50 text-red-700 p-3 rounded-lg mb-4 flex items-center">
+                <span>Error: {error}</span>
+            </div>
+        )}
 
-        <div className="space-y-4">
-          {pitfalls?.map((cp, idx) => (
-            <PitfallCard
-              key={`cp-${idx}`}
-              pitfall={cp}
-              index={idx}
-            />
-          ))}
-        </div>
+        {pitfalls.length > 0 ? (
+            <div className="space-y-4">
+                {pitfalls?.map((cp, idx) => (
+                    <PitfallCard
+                        key={`cp-${idx}`}
+                        pitfall={cp}
+                        index={idx}
+                    />
+                ))}
+            </div>
+        ) : !loading && (
+            <div className="text-center py-8 text-gray-500">
+                <p>No pitfalls analysis available yet.</p>
+            </div>
+        )}
       </div>
   );
 }

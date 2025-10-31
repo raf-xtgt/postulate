@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { FaRobot } from "react-icons/fa";
+import { FaRobot, FaExclamationTriangle, FaQuoteRight } from "react-icons/fa";
 import { useStateController } from "@/app/context/stateController";
 import Pitfall from "./pitfall/pitfall";
 import Citation from "./citation/citation";
@@ -12,20 +12,20 @@ export default function LlmMain() {
 
 
   return (
-    <div className="h-full flex flex-col bg-white">
+    <div className="h-full flex flex-col bg-gray-50 rounded-xl overflow-hidden">
       
-      <div className="border-b">
+      <div className="border-b border-gray-200 bg-white">
         <div className="p-4 flex items-center">
-            <FaRobot className="text-blue-600 mr-2" />
-            <h2 className="font-semibold text-lg">Pitfalls</h2>
+            <FaExclamationTriangle className="text-amber-500 mr-2 text-lg" />
+            <h2 className="font-bold text-lg text-gray-800">Pitfalls Analysis</h2>
         </div>
         <Pitfall></Pitfall>
       </div>
 
-      <div className="border-b">
+      <div className="border-t border-gray-200 bg-white mt-4">
         <div className="p-4 flex items-center">
-          <FaRobot className="text-blue-600 mr-2" />
-          <h2 className="font-semibold text-lg">Citations</h2>
+          <FaQuoteRight className="text-indigo-500 mr-2 text-lg" />
+          <h2 className="font-bold text-lg text-gray-800">Citations</h2>
         </div>
         <Citation />
       </div>

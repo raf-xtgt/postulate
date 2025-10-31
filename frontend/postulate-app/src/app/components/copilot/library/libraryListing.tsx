@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { FaFileImport } from 'react-icons/fa';
+import { FaFileImport, FaSearch, FaFilePdf, FaRegFolder } from 'react-icons/fa';
 import { LibraryModel } from '@/app/models/library';
 import AddLibraryDoc from './addLibraryDoc';
 
@@ -75,39 +75,52 @@ export default function LibraryListing() {
       session.file_name.toLowerCase().includes(search.toLowerCase())
     );
       return (
-        <div>
+        <div className="bg-gray-50 rounded-xl p-4 h-full">
           <div className="h-full flex flex-col">
             {/* Channels Section (LibraryDocs Dropdown) */}
-            <div className="border-b">
-              <h2 className="font-semibold mb-2 flex justify-between items-center">
-                LibraryDocs
+            <div className="pb-4 border-b border-gray-200">
+              <h2 className="font-bold text-lg mb-3 flex justify-between items-center text-gray-800">
+                <span className="flex items-center gap-2">
+                  <FaRegFolder className="text-indigo-600" /> Library Documents
+                </span>
                 <button 
                   onClick={() => setIsModalOpen(true)}
-                  className="flex items-center justify-center p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700"
-                  aria-label="Add customer">
+                  className="flex items-center justify-center p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                  aria-label="Add library document">
                   <FaFileImport />
                 </button>
               </h2>
 
               {/* Search input */}
-              <input
-                type="text"
-                placeholder="Search LibraryDocs..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full p-2 mb-2 border rounded"
-              />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaSearch className="text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search library documents..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
 
-              <ul className="max-h-48 overflow-y-auto">
+              <ul className="mt-3 max-h-96 overflow-y-auto space-y-1">
                 {filteredLibraryDocs.map((session, index) => (
                   <li
                     key={index} // 🔹 incremental numeric key
-                    className={`p-2 rounded cursor-pointer flex justify-between items-center relative hover:bg-gray-100`}
+                    className={`p-3 rounded-lg cursor-pointer flex justify-between items-center relative hover:bg-indigo-50 transition-colors ${selectedLibraryDoc?.guid === session.guid ? 'bg-indigo-100 border border-indigo-300' : 'bg-white border border-gray-200'}`}
                     onClick={() => {
                       setSelectedLibraryDoc(session); // 🔹 store selected LibraryDoc
                     }}
                   >
-                    <span>{session.file_name}</span>
+                    <div className="flex items-center gap-3">
+                      <FaFilePdf className="text-red-500" />
+                      <span className="font-medium text-gray-800 truncate max-w-[160px]">{session.file_name}</span>
+                    </div>
+                    <span className="text-xs text-gray-500">
+                      {new Date(session.created_date).toLocaleDateString()}
+                    </span>
                   </li>
                 ))}
               </ul>

@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { useStateController } from '@/app/context/stateController';
 import { CitationModel } from '@/app/models/citation';
+import { FaBold, FaHeading, FaHighlighter, FaSearch } from 'react-icons/fa';
 
 export default function Editor() {
     const { addCitation } = useStateController();
@@ -43,31 +44,69 @@ export default function Editor() {
     };
 
     return (
-        <div className="p-4 h-full flex flex-col">
-            <h1 className="text-2xl font-bold mb-4">Writing Editor</h1>
-            <div className="bg-white rounded-lg shadow-md flex-grow flex flex-col">
-                <div className="border-b p-2 flex items-center gap-2">
-                    <button onClick={() => formatDoc('bold')} className="px-2 py-1 border rounded font-bold">B</button>
-                    <button onClick={() => formatDoc('formatBlock', '<h1>')} className="px-2 py-1 border rounded">H1</button>
-                    <button onClick={() => formatDoc('formatBlock', '<h2>')} className="px-2 py-1 border rounded">H2</button>
-                    <button onClick={() => formatDoc('formatBlock', '<h3>')} className="px-2 py-1 border rounded">H3</button>
-                    <button onClick={() => formatDoc('backColor', 'yellow')} className="px-2 py-1 border rounded bg-yellow-200">Highlight</button>
+        <div className="p-4 h-full flex flex-col bg-gray-50 rounded-xl">
+            <h1 className="text-2xl font-bold mb-4 text-gray-800">Writing Editor</h1>
+            <div className="bg-white rounded-xl shadow-lg flex-grow flex flex-col border border-gray-200">
+                <div className="border-b border-gray-200 p-3 flex items-center gap-2 flex-wrap">
+                    <button 
+                        onClick={() => formatDoc('bold')} 
+                        className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 flex items-center justify-center"
+                        aria-label="Bold"
+                        title="Bold"
+                    >
+                        <FaBold className="text-gray-700" />
+                    </button>
+                    <button 
+                        onClick={() => formatDoc('formatBlock', '<h1>')} 
+                        className="px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 text-gray-700 font-bold text-sm"
+                        title="Heading 1"
+                    >
+                        H1
+                    </button>
+                    <button 
+                        onClick={() => formatDoc('formatBlock', '<h2>')} 
+                        className="px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 text-gray-700 font-bold text-sm"
+                        title="Heading 2"
+                    >
+                        H2
+                    </button>
+                    <button 
+                        onClick={() => formatDoc('formatBlock', '<h3>')} 
+                        className="px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 text-gray-700 font-bold text-sm"
+                        title="Heading 3"
+                    >
+                        H3
+                    </button>
+                    <button 
+                        onClick={() => formatDoc('backColor', 'yellow')} 
+                        className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 flex items-center justify-center"
+                        aria-label="Highlight"
+                        title="Highlight"
+                    >
+                        <FaHighlighter className="text-yellow-500" />
+                    </button>
                 </div>
                 <div
                     ref={editorRef}
                     contentEditable={true}
                     onMouseUp={handleMouseUp}
-                    className="flex-grow p-2 focus:outline-none"
+                    className="flex-grow p-4 focus:outline-none min-h-[300px] text-gray-700 leading-relaxed"
                     suppressContentEditableWarning={true}
                 >
                     
                 </div>
                 {tooltip.visible && (
                     <div
-                        className="absolute bg-black text-white text-xs rounded py-1 px-2 z-10"
+                        className="fixed bg-indigo-600 text-white text-sm rounded-lg py-2 px-3 z-50 shadow-lg flex items-center gap-2 transition-all duration-200"
                         style={{ top: tooltip.top, left: tooltip.left }}
                     >
-                        <button onClick={handleSearchCitations}>Search Citations</button>
+                        <FaSearch className="text-white" />
+                        <button 
+                            onClick={handleSearchCitations}
+                            className="font-medium hover:underline"
+                        >
+                            Search Citations
+                        </button>
                     </div>
                 )}
             </div>

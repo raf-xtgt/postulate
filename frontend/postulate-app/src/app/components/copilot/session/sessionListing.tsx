@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { FaPlus } from 'react-icons/fa';
+import { FaPlus, FaSearch, FaFolderOpen, FaClock } from 'react-icons/fa';
 import { SessionModel } from '@/app/models/session';
 import AddSession from './addSession';
 import LibraryListing from '../library/libraryListing';
@@ -70,39 +70,55 @@ export default function SessionListing() {
       session.title.toLowerCase().includes(search.toLowerCase())
     );
       return (
-        <div>
+        <div className="bg-gray-50 rounded-xl p-4 h-full flex flex-col">
           <div className="h-full flex flex-col">
             {/* Channels Section (Sessions Dropdown) */}
-            <div className="p-4 border-b">
-              <h2 className="font-semibold mb-2 flex justify-between items-center">
-                Sessions
+            <div className="pb-4 border-b border-gray-200">
+              <h2 className="font-bold text-lg mb-3 flex justify-between items-center text-gray-800">
+                <span className="flex items-center gap-2">
+                  <FaFolderOpen className="text-indigo-600" /> Research Sessions
+                </span>
                 <button 
                   onClick={() => setIsModalOpen(true)}
-                  className="flex items-center justify-center p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700"
-                  aria-label="Add customer">
+                  className="flex items-center justify-center p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                  aria-label="Add session">
                   <FaPlus />
                 </button>
               </h2>
 
               {/* Search input */}
-              <input
-                type="text"
-                placeholder="Search Sessions..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full p-2 mb-2 border rounded"
-              />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaSearch className="text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search sessions..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
 
-              <ul className="max-h-48 overflow-y-auto">
+              <ul className="mt-3 max-h-60 overflow-y-auto space-y-2">
                 {filteredSessions.map((session, index) => (
                   <li
                     key={index} // 🔹 incremental numeric key
-                    className={`p-2 rounded cursor-pointer flex justify-between items-center relative hover:bg-gray-100`}
+                    className={`p-3 rounded-lg cursor-pointer flex justify-between items-center relative transition-colors ${
+                      selectedSession?.guid === session.guid 
+                        ? 'bg-indigo-100 border border-indigo-300' 
+                        : 'bg-white border border-gray-200 hover:bg-gray-50'
+                    }`}
                     onClick={() => {
                       setSelectedSession(session); // 🔹 store selected Session
                     }}
                   >
-                    <span>{session.title}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-gray-800 truncate">{session.title}</div>
+                      <div className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                        <FaClock /> {new Date(session.created_date).toLocaleDateString()}
+                      </div>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -110,22 +126,24 @@ export default function SessionListing() {
 
             {/* Selected Session Card */}
             {selectedSession && (
-              <div className="p-4 border-b bg-gray-50">
-                <div className="flex justify-between items-center">
-                  <h3 className="font-semibold text-lg">{selectedSession.title}</h3>
+              <div className="py-4 border-b border-gray-200 bg-white rounded-lg p-4 my-3">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-gray-800 truncate">{selectedSession.title}</h3>
+                    <p className="text-sm text-gray-600 mt-1 truncate">{selectedSession.description}</p>
+                  </div>
                   <button
                     onClick={() => handleStartSession(selectedSession.guid)}
-                    className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+                    className="ml-4 px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors whitespace-nowrap"
                   >
-                    Continue session
+                    Continue Session
                   </button>
                 </div>
-                <p className="text-sm text-gray-600 mt-1">{selectedSession.title}</p>
               </div>
             )}
 
             {/* Chats Section */}
-            <div className="p-4 flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto mt-3">
               <LibraryListing></LibraryListing>
             </div>
 
