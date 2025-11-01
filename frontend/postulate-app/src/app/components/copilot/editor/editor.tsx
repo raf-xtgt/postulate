@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import { useStateController } from '@/app/context/stateController';
 import { CitationModel } from '@/app/models/citation';
-import { FaBold, FaHeading, FaHighlighter, FaSearch } from 'react-icons/fa';
+import { FaBold, FaSearchengin, FaHighlighter, FaSearch } from 'react-icons/fa';
 
 export default function Editor() {
     const { addCitation } = useStateController();
@@ -38,6 +38,10 @@ export default function Editor() {
         setTooltip({ ...tooltip, visible: false });
     };
 
+    const handleValueCapture = () => {
+        console.log("handleValueCapture")
+    };
+
     const formatDoc = (command: string, value?: string) => {
         document.execCommand(command, false, value);
         editorRef.current?.focus();
@@ -45,7 +49,15 @@ export default function Editor() {
 
     return (
         <div className="p-4 h-full flex flex-col bg-gray-50 rounded-xl">
-            <h1 className="text-2xl font-bold mb-4 text-gray-800">Writing Editor</h1>
+            <div className="mb-3 flex justify-between items-center ">
+                <h1 className="text-2xl font-bold mb-4 text-gray-800">Writing Editor</h1>
+                <button 
+                    onClick={() => handleValueCapture()}
+                    className="flex items-center justify-center p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                    aria-label="Add session">
+                    <FaSearchengin /> Capture Impact Points
+                </button>
+            </div>
             <div className="bg-white rounded-xl shadow-lg flex-grow flex flex-col border border-gray-200">
                 <div className="border-b border-gray-200 p-3 flex items-center gap-2 flex-wrap">
                     <button 
