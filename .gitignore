@@ -1,1 +1,7 @@
 planning
+backend/postulate_webservice_venv
+backend/.env
+backend/app/postulate-creds.json
+backend/app/__pycache__
+backend/app/routers/__pycache__
+backend/app/routers/session/__pycache__
