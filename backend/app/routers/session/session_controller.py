@@ -17,3 +17,16 @@ async def get_stock_info():
         }
     except Exception as e:
         return {"error": str(e)}
+
+
+@router.post("/test")
+async def get_stock_info():
+    """
+    Get financial information for a specific stock ticker.
+    """
+    try:
+        return {
+            "response": "Hola"
+        }
+    except Exception as e:
+        return {"error": str(e)}
