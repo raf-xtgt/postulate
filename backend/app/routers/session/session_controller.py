@@ -1,4 +1,8 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.models.session.ps_session import PSSessionCreate, PSSession
+from app.config.db_config import get_db
+from app.services.session.session_service import SessionService
 
 # 1. Create a router object
 router = APIRouter(
@@ -6,27 +10,15 @@ router = APIRouter(
     tags=["Session"]    # Groups routes under "Finance" in the API docs
 )
 
-@router.get("/test")
-async def get_stock_info():
-    """
-    Get financial information for a specific stock ticker.
-    """
-    try:
-        return {
-            "response": "Hola"
-        }
-    except Exception as e:
-        return {"error": str(e)}
+session_service = SessionService()
 
-
-@router.post("/test")
-async def get_stock_info():
+@router.post("/create", response_model=PSSession)
+async def create_session(
+    session: PSSessionCreate,
+    db: AsyncSession = Depends(get_db)
+):
     """
-    Get financial information for a specific stock ticker.
+    Create a new session.
     """
-    try:
-        return {
-            "response": "Hola"
-        }
-    except Exception as e:
-        return {"error": str(e)}
+    print("new session")
+    return await session_service.create_session(db=db, session=session)

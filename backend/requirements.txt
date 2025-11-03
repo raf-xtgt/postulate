@@ -7,3 +7,4 @@ google-cloud-aiplatform
 google-generativeai
 fastapi
 uvicorn[standard]
+asyncpg

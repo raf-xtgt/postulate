@@ -25,6 +25,7 @@ This is a modular FastAPI application with a PSQL database connection and a simp
 
     ```bash
     uvicorn app.main:app --reload
+    
     ```
 
 ## API Endpoints
