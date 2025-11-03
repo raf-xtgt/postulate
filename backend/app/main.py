@@ -5,6 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .routers import finance
 from .routers import session
+from .routers import file_upload
+
 load_dotenv()
 
 app = FastAPI(
@@ -29,7 +31,7 @@ app.add_middleware(
 url_prefix = "/ps"
 app.include_router(finance.router, prefix=url_prefix)
 app.include_router(session.router, prefix=url_prefix)
-
+app.include_router(file_upload.router, prefix=url_prefix)
 
 
 # A simple root endpoint
