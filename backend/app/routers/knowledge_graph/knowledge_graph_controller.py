@@ -8,6 +8,18 @@ router = APIRouter(
     tags=["KnowledgeGraph"] 
 )
 
-session_service = SessionService()
+kg_service = KGService()
+
+from typing import List
+import uuid
+from fastapi import Body
 
 ## TODO: Endpoint to construct knowledge graph given a list of file guids
+@router.post("/construct")
+async def construct_kg(
+    file_guids: List[uuid.UUID] = Body(..., embed=True),
+    db: AsyncSession = Depends(get_db)
+):
+    await kg_service.construct_kg_from_files(file_guids, db)
+    return {"message": "Knowledge graph construction started."}
+
