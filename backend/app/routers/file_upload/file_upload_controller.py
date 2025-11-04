@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
+from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.file.ps_file_item import PSFileItemCreate, PSFileItem
 from app.config.db_config import get_db
 from app.services.session.session_service import SessionService
 from app.config.storage_config import bucket, BUCKET_NAME
 from app.services.file_upload.file_upload_service import FileUploadService
+from io import BytesIO
 
 # 1. Create a router object
 router = APIRouter(
@@ -47,6 +49,35 @@ async def upload_file_to_gcs(
         )
         
         return await file_upload_service.create_file_upload_record(db=db, file_upload=file_upload)
+    except Exception as e:
+        print("error", e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/{guid}")
+async def get_file_from_gcs(
+    guid: str,
+    db: AsyncSession = Depends(get_db)
+):
+    """Retrieves a file from Google Cloud Storage."""
+    try:
+        file_record = await file_upload_service.get_file_by_guid(db=db, guid=guid)
+        if not file_record:
+            raise HTTPException(status_code=404, detail="File not found")
+
+        blob = bucket.blob(file_record.file_name)
+        if not blob.exists():
+            raise HTTPException(status_code=404, detail="File not found in GCS")
+
+        # Download the file to a BytesIO object
+        file_stream = BytesIO()
+        blob.download_to_file(file_stream)
+        file_stream.seek(0)  # Rewind the stream to the beginning
+
+        return StreamingResponse(
+            file_stream,
+            media_type=file_record.mime_type,
+            headers={"Content-Disposition": f"attachment; filename={file_record.file_name}"}
+        )
     except Exception as e:
         print("error", e)
         raise HTTPException(status_code=500, detail=str(e))

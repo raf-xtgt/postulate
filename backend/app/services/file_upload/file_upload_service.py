@@ -5,8 +5,11 @@ class FileUploadService:
 
     # TODO: Create a method to upload a file to google cloud storage and retrieve the file name, file url and mime_type
 
-
-    # TODO: Create a method to retrieve a file given the guid
+    async def get_file_by_guid(self, db: AsyncSession, guid: str) -> PSFileItemDB:
+        """
+        Retrieves a file from the database by its GUID.
+        """
+        return await db.get(PSFileItemDB, guid)
 
     async def create_file_upload_record(self, db: AsyncSession, file_upload: PSFileItemCreate) -> PSFileItemDB:
         """
