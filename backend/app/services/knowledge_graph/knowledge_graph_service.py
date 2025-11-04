@@ -31,21 +31,12 @@ class KGService:
                             text_content += page.extract_text()
                 else:
                     text_content = file_content_bytes.decode('utf-8')
+                
+                await process_file_content(text_content, db)
 
-                paragraphs = [p.strip() for p in text_content.split('\n\n') if p.strip()]
-
-                for paragraph in paragraphs:
-                    # This is a placeholder for the actual structured output call
-                    # as the current google-generativeai library version in requirements
-                    # might not support it directly in the way I want.
-                    # I will simulate the extraction for now.
-                    # In a real scenario, I would use a newer version or a different approach
-                    # to get structured JSON output.
-                    
-                    # Placeholder extraction
-                    extracted_kg = await self._extract_kg_from_text(paragraph)
-                    if extracted_kg:
-                        await self._save_kg(extracted_kg, file_guid, db)
+    async def process_file_content(self, text_content:str, db: AsyncSession):
+        # TODO: Process the file content
+        return None
 
     async def _extract_kg_from_text(self, text: str) -> KnowledgeGraph | None:
         # This is a placeholder for a real implementation that would use a

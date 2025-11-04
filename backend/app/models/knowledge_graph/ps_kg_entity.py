@@ -1,11 +1,12 @@
 from sqlalchemy import Column, String, Text
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.dialects.postgresql import VECTOR
 import uuid
 from datetime import datetime
 from pydantic import BaseModel
 from app.config.db_config import Base
 from sqlalchemy.sql import func
+from pgvector.sqlalchemy import Vector
+
 
 
 class PSKgEntityDB(Base):
@@ -15,7 +16,7 @@ class PSKgEntityDB(Base):
     entity_type = Column(String(100), index=True)
     file_guid = Column(UUID(as_uuid=True), index=True)
     content = Column(Text)
-    content_vec = Column(VECTOR)  # no dimension specified, supports dynamic embedding sizes
+    content_vec = Column(Vector())  # no dimension specified, supports dynamic embedding sizes
     name = Column(String(255), index=True)
 
 
