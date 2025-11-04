@@ -8,7 +8,7 @@ class FileUploadService:
 
     # TODO: Create a method to retrieve a file given the guid
 
-    async def create_file_upload_record(self, db: AsyncSession, file_upload: PSFileItemCreate) -> PSSessionDB:
+    async def create_file_upload_record(self, db: AsyncSession, file_upload: PSFileItemCreate) -> PSFileItemDB:
         """
         Creates a new session in the database.
         """

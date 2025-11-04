@@ -10,8 +10,9 @@ class PSFileItemDB(Base):
 
     guid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     file_name = Column(String(255), nullable=False)
-    file_url  = Column(Text, nullable=False)
-    mime_type  = Column(String(255))
+    file_url  = Column(Text)
+    file_path = Column(Text)
+    mime_type  = Column(String(100))
     created_date = Column(DateTime(timezone=True), server_default=func.now())
     last_update = Column(DateTime(timezone=True),  server_default=func.now(), onupdate=func.now())
 

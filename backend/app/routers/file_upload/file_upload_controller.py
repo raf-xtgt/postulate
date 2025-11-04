@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends, UploadFile, File
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.file.ps_file_item import PSFileItemCreate, PSFileItem
 from app.config.db_config import get_db
 from app.services.session.session_service import SessionService
 from app.config.storage_config import bucket, BUCKET_NAME
+from app.services.file_upload.file_upload_service import FileUploadService
 
 # 1. Create a router object
 router = APIRouter(
@@ -12,6 +13,7 @@ router = APIRouter(
 )
 
 session_service = SessionService()
+file_upload_service = FileUploadService()
 
 @router.post("/upload-file", response_model=PSFileItem)
 async def uploadFile(
@@ -24,8 +26,11 @@ async def uploadFile(
     print("new session")
     return await session_service.create_session(db=db, session=session)
 
-@router.post("/upload")
-async def upload_file_to_gcs(file: UploadFile = File(...)):
+@router.post("/upload", response_model=PSFileItem)
+async def upload_file_to_gcs(
+    file: UploadFile = File(...),
+    db: AsyncSession = Depends(get_db)
+):
     """Uploads a file to Google Cloud Storage."""
     try:
         # Create a Blob object with the desired file name in GCS
@@ -35,10 +40,13 @@ async def upload_file_to_gcs(file: UploadFile = File(...)):
         # The .file attribute provides the file-like object
         blob.upload_from_file(file.file, content_type=file.content_type)
         
-        return {
-            "filename": file.filename,
-            "gcs_uri": f"gs://{BUCKET_NAME}/{file.filename}",
-            "message": "File uploaded successfully"
-        }
+        file_upload = PSFileItemCreate(
+            file_name=file.filename,
+            file_url=f"gs://{BUCKET_NAME}/{file.filename}",
+            mime_type=file.content_type
+        )
+        
+        return await file_upload_service.create_file_upload_record(db=db, file_upload=file_upload)
     except Exception as e:
         print("error", e)
+        raise HTTPException(status_code=500, detail=str(e))
