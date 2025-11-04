@@ -7,8 +7,8 @@ class PaperDetails(BaseModel):
     """Metadata for the main research paper."""
     title: str = Field(description="The full title of the research paper.")
     authors: List[str] = Field(description="A list of all author names.")
-    publication_venue: Optional[str] = Field(description="The journal, conference, or publication venue.", default=None)
-    year: Optional[int] = Field(description="The publication year.", default=None)
+    publication_venue: Optional[str] = Field(description="The journal, conference, or publication venue." )
+    year: Optional[int] = Field(description="The publication year." )
 
 # --- Round 2 Schema ---
 class SectionChunk(BaseModel):
@@ -49,5 +49,5 @@ class ReferenceDetails(BaseModel):
     """Parsed details of a cited reference."""
     title: str = Field(description="The full title of the research paper.")
     authors: List[str] = Field(description="A list of all author names.")
-    publication_venue: Optional[str] = Field(description="The journal, conference, or publication venue.", default=None)
-    year: Optional[int] = Field(description="The publication year.", default=None)
+    publication_venue: Optional[str] = Field(description="The journal, conference, or publication venue." )
+    year: Optional[int] = Field(description="The publication year." )

@@ -53,9 +53,7 @@ class KGService:
         if not paper_entity:
             print(f"Failed to create main paper entity for file {file_guid}. Aborting.")
             return
-        
         print(f"✅ Created ResearchPaper entity: {paper_entity.name}")
-
 
         # # === ROUND 2: Section Entities & Relationships ===
         # print("--- Round 2: Processing Sections ---")
@@ -87,6 +85,9 @@ class KGService:
 
         # print(f"KG construction finished for file: {file_guid}")
         # await db.commit()
+
+        # await db.commit()
+
 
     async def _process_round_1(self, text_content: str, file_guid: uuid.UUID, db: AsyncSession) -> Optional[PSKgEntityDB]:
         """Executes Round 1: Create ResearchPaper Entity"""
@@ -291,7 +292,7 @@ class KGService:
                 prompt,
                 generation_config=genai.types.GenerationConfig(
                     response_mime_type="application/json",
-                    response_schema=response_model.schema()
+                    response_schema=response_model
                 )
             )
             print("structured content response", response)
