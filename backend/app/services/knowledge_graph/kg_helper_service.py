@@ -48,7 +48,7 @@ class KGHelperService:
             Text:
             {text[:10000]}
             """
-            return await self._generate_structured_content(prompt, List[SectionChunk])
+            return await self._generate_structured_content(prompt, SectionChunkList)
         
         elif chunk_type == "paragraphs":
             # A simple heuristic split is often more reliable and cheaper

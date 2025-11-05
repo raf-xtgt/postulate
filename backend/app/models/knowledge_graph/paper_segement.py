@@ -14,7 +14,11 @@ class PaperDetails(BaseModel):
 class SectionChunk(BaseModel):
     """A single section of the research paper."""
     section_title: str = Field(description="The title of this section (e.g., 'Introduction', 'Methodology').")
-    section_text: str = Field(description="The full text content of this section.")
+    section_text: Optional[str]  = Field(description="The full text content of this section.")
+
+class SectionChunkList(BaseModel):
+    """A wrapper model to hold a list of SectionChunk items."""
+    sections: List[SectionChunk]
 
 class SectionSummary(BaseModel):
     """A summary of a given section."""

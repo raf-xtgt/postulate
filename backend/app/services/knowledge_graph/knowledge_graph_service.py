@@ -62,7 +62,7 @@ class KGService:
         print(f"✅ Separated ResearchPaper into sections")
 
         section_entities = {} # {section_title: PSKgEntityDB}
-        for section_data in section_chunks:
+        for section_data in section_chunks.sections:
             section_entity = await self._process_round_2(section_data, paper_entity.guid, file_guid, db)
             if section_entity:
                 section_entities[section_data.section_title] = (section_entity, section_data.section_text)
@@ -76,7 +76,7 @@ class KGService:
             if not paragraph_chunks:
                 continue
 
-            for para_text in paragraph_chunks:
+            for para_text in paragraph_chunks.sections:
                 await self._process_round_3(para_text, section_entity.guid, file_guid, db)
 
         # === ROUND 4: Handling References ===
