@@ -8,18 +8,22 @@ from app.models.knowledge_graph.graph_extraction import KnowledgeGraph, Entity, 
 from app.models.knowledge_graph.paper_segement import *
 from app.models.knowledge_graph.ps_kg_entity import PSKgEntityCreate, PSKgEntityDB
 from app.models.knowledge_graph.ps_kg_relationship import PSKgRelationshipCreate, PSKgRelationshipDB
-import google.generativeai as genai
 from pypdf import PdfReader
 import io
 from typing import List, Literal, Optional
 from docling_core.types.doc.document import DoclingDocument # CORRECTED IMPORT
+from vertexai.language_models import TextEmbeddingModel
+from vertexai.generative_models import GenerativeModel, GenerationConfig
+from pydantic import BaseModel
+
+EMBEDDING_MODEL_NAME = "text-embedding-004" 
+embedding_model = TextEmbeddingModel.from_pretrained(EMBEDDING_MODEL_NAME)
 
 class KGHelperService:
     def __init__(self):
-        self.generative_model = genai.GenerativeModel(
-            'gemini-2.0-flash'
+        self.generative_model = GenerativeModel(
+            "gemini-2.0-flash" 
         )
-
 
     def _get_sections_from_docling(self, doc: DoclingDocument) -> Optional[SectionChunkList]:
         """
@@ -78,13 +82,15 @@ class KGHelperService:
             
             response = await self.generative_model.generate_content_async(
                 prompt,
-                generation_config=genai.types.GenerationConfig(
+                generation_config=GenerationConfig(
                     response_mime_type="application/json",
-                    response_schema=response_model
+                    response_schema=response_model.model_json_schema() # Use .model_json_schema() for Vertex
                 )
             )
             # print("structured content response", response) # Optional: for debugging
             response_text = response.text.strip().replace("```json", "").replace("```", "")
+            print("response text")
+            print(response_text)
             return response_model.model_validate_json(response_text)
         except Exception as e:
             print(f"Error generating structured content: {e}")
@@ -125,24 +131,33 @@ class KGHelperService:
     
     async def _create_entity(self, db: AsyncSession, entity_type: str, content: str, name: str, file_guid: Optional[uuid.UUID]) -> PSKgEntityDB:
         """Creates an embedding and saves a new entity to the DB."""
-        embedding_response = await genai.embed_content_async(
-            model='models/embedding-001',
-            content=content,
-            task_type="RETRIEVAL_DOCUMENT"
-        )
-        embedding = embedding_response['embedding']
-
-        new_entity = PSKgEntityCreate(
-            entity_type=entity_type,
-            file_guid=file_guid,
-            content=content,
-            content_vec=embedding,
-            name=name
-        )
-        db_entity = PSKgEntityDB(**new_entity.dict())
-        db.add(db_entity)
-        await db.flush() # Flush to get the new guid
-        return db_entity
+        try:
+            # 💡 FIX: Removed the 'task_type' argument
+            embedding_response = await embedding_model.get_embeddings_async(
+                [content]
+            )
+            
+            # Vertex AI returns a list of embedding objects (one for each item in the input list)
+            # We need the vector from the first (and only) item.
+            embedding = embedding_response[0].values
+            
+            # ... (rest of the code is unchanged) ...
+            new_entity = PSKgEntityCreate(
+                entity_type=entity_type,
+                file_guid=file_guid,
+                content=content,
+                content_vec=embedding,
+                name=name
+            )
+            db_entity = PSKgEntityDB(**new_entity.dict())
+            db.add(db_entity)
+            await db.flush() # Flush to get the new guid
+            return db_entity 
+        
+        except Exception as e:
+            print(f"Error generating embedding with Vertex AI: {e}")
+            # Handle error or raise it
+            return None
 
     async def _create_relationship(self, db: AsyncSession, source_guid: uuid.UUID, target_guid: uuid.UUID, relationship_type: str):
         """Saves a new relationship to the DB."""

@@ -9,7 +9,6 @@ from app.models.knowledge_graph.graph_extraction import KnowledgeGraph, Entity, 
 from app.models.knowledge_graph.paper_segement import *
 from app.models.knowledge_graph.ps_kg_entity import PSKgEntityCreate, PSKgEntityDB
 from app.models.knowledge_graph.ps_kg_relationship import PSKgRelationshipCreate, PSKgRelationshipDB
-import google.generativeai as genai
 from pypdf import PdfReader
 import io
 import tempfile

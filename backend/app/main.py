@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from dotenv import load_dotenv
 import os
 from fastapi.middleware.cors import CORSMiddleware
-
+import vertexai
 from .routers import finance
 from .routers import session
 from .routers import file_upload
@@ -10,10 +10,13 @@ from .routers.knowledge_graph import knowledge_graph_controller
 
 load_dotenv()
 
-import google.generativeai as genai
+GCP_PROJECT_ID = os.getenv("GCP_PROJECT_ID")
+GCP_REGION = os.getenv("GCP_REGION") # e.g., "us-central1"
 
-# Configure genai
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+if not GCP_PROJECT_ID or not GCP_REGION:
+    raise EnvironmentError("GCP_PROJECT_ID and GCP_REGION environment variables must be set.")
+
+vertexai.init(project=GCP_PROJECT_ID, location=GCP_REGION)
 
 app = FastAPI(
     title="Modular Web Service",
