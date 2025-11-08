@@ -86,12 +86,12 @@ class KGService:
             return
 
         # === ROUND 1: ResearchPaper Entity ===
-        # print("--- Round 1: Processing Paper Entity ---")
-        # paper_entity = await self._process_round_1(full_text_content, file_guid, db)
-        # if not paper_entity:
-        #     print(f"Failed to create main paper entity for file {file_guid}. Aborting.")
-        #     return
-        # print(f"✅ Created ResearchPaper entity: {paper_entity.name}")
+        print("--- Round 1: Processing Paper Entity ---")
+        paper_entity = await self._process_round_1(full_text_content, file_guid, db)
+        if not paper_entity:
+            print(f"Failed to create main paper entity for file {file_guid}. Aborting.")
+            return
+        print(f"✅ Created ResearchPaper entity: {paper_entity.name}")
 
         # === ROUND 2: Section Entities & Relationships ===
         print("--- Round 2: Processing Sections ---")
@@ -109,37 +109,38 @@ class KGService:
         print(f"✅ Separated ResearchPaper into {len(section_chunk_list.sections)} sections.")
         for s in section_chunk_list.sections:
             print(s)
+            print("\n")
         
 
-        # section_entities = {} # {section_title: (PSKgEntityDB, section_text)}
-        # for section_data in section_chunk_list.sections:
-        #     section_entity = await self._process_round_2(section_data, paper_entity.guid, file_guid, db)
-        #     if section_entity:
-        #         section_entities[section_data.section_title] = (section_entity, section_data.section_text)
-        # print(f"✅ Completed ResearchPaper section entity generation")
+        section_entities = {} # {section_title: (PSKgEntityDB, section_text)}
+        for section_data in section_chunk_list.sections:
+            section_entity = await self._process_round_2(section_data, paper_entity.guid, file_guid, db)
+            if section_entity:
+                section_entities[section_data.section_title] = (section_entity, section_data.section_text)
+        print(f"✅ Completed ResearchPaper section entity generation")
 
-        # # === ROUND 3: Fine-grained Entities & Relationships ===
-        # print("--- Round 3: Processing Paragraphs ---")
-        # for section_title, (section_entity, section_text) in section_entities.items():
-        #     if not section_text: # Skip sections that had no text
-        #         continue
+        # === ROUND 3: Fine-grained Entities & Relationships ===
+        print("--- Round 3: Processing Paragraphs ---")
+        for section_title, (section_entity, section_text) in section_entities.items():
+            if not section_text: # Skip sections that had no text
+                continue
                 
-        #     print(f"Processing paragraphs for section: {section_title}")
-        #     # This helper now returns a SectionChunkList where each "section" is a paragraph
-        #     paragraph_chunks = await self.helper_service._get_text_chunks(section_text, "paragraphs")
+            print(f"Processing paragraphs for section: {section_title}")
+            # This helper now returns a SectionChunkList where each "section" is a paragraph
+            paragraph_chunks = await self.helper_service._get_text_chunks(section_text, "paragraphs")
             
-        #     if not paragraph_chunks:
-        #         continue
+            if not paragraph_chunks:
+                continue
 
-        #     # Iterate over paragraph_chunks.sections and pass the .section_text
-        #     for para_chunk in paragraph_chunks.sections:
-        #         await self._process_round_3(para_chunk.section_text, section_entity.guid, file_guid, db)
+            # Iterate over paragraph_chunks.sections and pass the .section_text
+            for para_chunk in paragraph_chunks.sections:
+                await self._process_round_3(para_chunk.section_text, section_entity.guid, file_guid, db)
 
-        # # === ROUND 4: Handling References ===
-        # print("--- Round 4: Reference handling is integrated into Round 3. ---")
+        # === ROUND 4: Handling References ===
+        print("--- Round 4: Reference handling is integrated into Round 3. ---")
 
-        # print(f"KG construction finished for file: {file_guid}")
-        # await db.commit()
+        print(f"KG construction finished for file: {file_guid}")
+        await db.commit()
 
 
     async def _process_round_1(self, text_content: str, file_guid: uuid.UUID, db: AsyncSession) -> Optional[PSKgEntityDB]:
@@ -184,7 +185,6 @@ class KGService:
 
         prompt = f"""
         Summarize the following section of a research paper titled '{section_data.section_title}'.
-        Respond with a JSON object that follows this schema:
         
         Text:
         {section_data.section_text[:8000]}
@@ -240,8 +240,9 @@ class KGService:
             Valid Entity Types: {list(ENTITY_TYPES.__args__)}
             Valid Relationship Types: {list(RELATIONSHIP_TYPES.__args__)}
 
-            Respond with a JSON object that follows this schema:
-            {ParagraphAnalysis.schema_json(indent=2)}
+            Provide a short name to the entity. 
+
+
             """
             analysis = await self.helper_service._generate_structured_content(prompt, ParagraphAnalysis)
             if not analysis:
@@ -268,7 +269,7 @@ class KGService:
                         db=db,
                         entity_type=classified.entity_type,
                         file_guid=file_guid,
-                        content=classified.content,
+                        content=para_text,
                         name=classified.name
                     )
                     # Create (Paragraph)-[REL]->(Classified_Entity)
@@ -299,11 +300,13 @@ class KGService:
 
             # 2. Parse the citation text to get details for the referenced paper
             prompt = f"""
-            Parse the following citation text and extract the paper details.
+            Parse the following citation text and extract the reference paper details. 
+            Extract the title of the reference paper.
+            Extract the authors of the reference paper. 
+            Extract the publication venue of the reference paper if available.
+            Extract the year of publication of the reference paper.
+
             Citation: "{citation_text}"
-            
-            Respond with a JSON object that follows this schema:
-            {ReferenceDetails.schema_json(indent=2)}
             """
             details = await self.helper_service._generate_structured_content(prompt, ReferenceDetails)
             if not details:

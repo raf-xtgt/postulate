@@ -41,8 +41,8 @@ class ClassifiedEntity(BaseModel):
     """An entity classified from a paragraph."""
     entity_type: ENTITY_TYPES = Field(description="The type of the classified entity.")
     relationship_type: RELATIONSHIP_TYPES = Field(description="The relationship from the paragraph to this entity.")
-    name: str = Field(description="A short name for this entity (e.g., 'SVM', 'Main Claim', 'p-value', 'Author et al. [2023]').")
-    content: str = Field(description="A summary of the entity's content as discussed in the paragraph, or the full citation text if it's a 'Citation'.")
+    name: Optional[str] = Field(description="A short name for this entity (e.g., 'SVM', 'Main Claim', 'p-value', 'Author et al. [2023]').")
+    content: Optional[str] = Field(description="A summary of the entity's content as discussed in the paragraph, or the full citation text if it's a 'Citation'.")
 
 class ParagraphAnalysis(BaseModel):
     """Analysis of a single paragraph, extracting multiple entities."""
