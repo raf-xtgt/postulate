@@ -6,7 +6,6 @@ class PaperDetails(BaseModel):
     """Metadata for the main research paper."""
     title: str
     authors: List[str]
-    # FIX: Swapped union order and moved description to config
     publication_venue: None | str
     year: None | int
     
@@ -25,7 +24,6 @@ class PaperDetails(BaseModel):
 class SectionChunk(BaseModel):
     """A single section of the research paper."""
     section_title: str = Field(description="The title of this section (e.g., 'Introduction', 'Methodology').")
-    # FIX: Swapped union order and removed Field()
     section_text: None | str
     
     model_config = ConfigDict(
@@ -61,7 +59,6 @@ class ClassifiedEntity(BaseModel):
     """An entity classified from a paragraph."""
     entity_type: ENTITY_TYPES = Field(description="The type of the classified entity.")
     relationship_type: RELATIONSHIP_TYPES = Field(description="The relationship from the paragraph to this entity.")
-    # FIX: Swapped union order and moved description to config
     name: None | str
     content: None | str
     
@@ -83,9 +80,7 @@ class ReferenceDetails(BaseModel):
     """Parsed details of a cited reference."""
     title: str = Field(description="The full title of the research paper.")
     authors: List[str] = Field(description="A list of all author names.")
-    # FIX: Swapped union order and moved description to config
     publication_venue: None | str
-    # FIX: Changed Optional[int] to None | int and moved description to config
     year: None | int
     
     model_config = ConfigDict(

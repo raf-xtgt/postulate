@@ -7,6 +7,7 @@ from .routers import finance
 from .routers import session
 from .routers import file_upload
 from .routers.knowledge_graph import knowledge_graph_controller
+from .routers.agent import agent_controller
 
 load_dotenv()
 
@@ -42,6 +43,7 @@ app.include_router(finance.router, prefix=url_prefix)
 app.include_router(session.router, prefix=url_prefix)
 app.include_router(file_upload.router, prefix=url_prefix)
 app.include_router(knowledge_graph_controller.router, prefix=url_prefix)
+app.include_router(agent_controller.router, prefix=url_prefix)
 
 
 # A simple root endpoint

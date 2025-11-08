@@ -3,14 +3,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
 from typing import List
 import uuid
-
+from app.models.knowledge_graph.api_dto import *
 from app.config.db_config import get_db
 from app.services.knowledge_graph.knowledge_graph_service import KGService
 from app.services.knowledge_graph.kg_search_service import KGSearchService
-
-# Define request model for search
-class KGSearchQuery(BaseModel):
-    query: str
 
 router = APIRouter(
     prefix="/kg",
