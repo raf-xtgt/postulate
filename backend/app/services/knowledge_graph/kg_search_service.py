@@ -77,7 +77,7 @@ class KGSearchService:
             if source_entity and target_entity:
                 # Make the sentence more readable
                 source_desc = f"The {source_entity.entity_type.lower()} '{source_entity.name}'"
-                target_desc = f"the {target_entity.entity_type.lower()} '{target_entity.name}'"
+                target_desc = f"the {target_entity.entity_type.lower()} '{target_entity.content}'"
                 
                 # Reformat relationship type for readability (e.g., 'HAS_SECTION' -> 'has section')
                 rel_desc = rel.relationship_type.replace('_', ' ').lower()
