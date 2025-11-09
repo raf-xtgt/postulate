@@ -5,7 +5,7 @@ export const SessionService = {
 
   async sessionCreate (payload: any): Promise<any>  {
     try {
-      const response = await fetch('http://localhost:5000/ps/session/create', {
+      const response = await fetch('http://localhost:8000/ps/session/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

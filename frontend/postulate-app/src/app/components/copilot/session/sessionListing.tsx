@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { FaPlus, FaSearch, FaFolderOpen, FaClock } from 'react-icons/fa';
 import { SessionModel } from '@/app/models/session';
+import { SessionService } from '@/app/services/sessionService';
 import AddSession from './addSession';
 import LibraryListing from '../library/libraryListing';
 
@@ -43,20 +44,21 @@ export default function SessionListing() {
       setSessions(sessions)
     }, []);
 
-    const handleAddSession = async (newCustomer: any) => {
+    const handleAddSession = async (session: SessionModel) => {
         try {
-        setLoading(true);
-        // const createdCustomer = await CustomerService.createCustomer(newCustomer);
-        
-        // Update local state with the new cp
-        // setSessions(prev => [...prev, createdCustomer]);
-        
-        // console.log('Customer created successfully:', createdCustomer);
+            setLoading(true);
+            const createdSession = await SessionService.sessionCreate({ title: session.title, description: session.description });
+
+            if (createdSession.error) {
+                setError(createdSession.error);
+            } else {
+                setSessions(prev => [...prev, createdSession]);
+            }
         } catch (err) {
-        setError('Failed to create cp');
-        console.error(err);
+            setError('Failed to create session');
+            console.error(err);
         } finally {
-        setLoading(false);
+            setLoading(false);
         }
     };
   
