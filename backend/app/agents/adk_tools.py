@@ -197,7 +197,7 @@ async def significance_analyzer(draft_text: str, db: AsyncSession) -> Significan
     return significance_analysis
 
 
-async def contradiction_detector(draft_text: str, db: AsyncSession) -> list[ContradictionAnalysis]:
+async def contradiction_detector(draft_text: str, db: AsyncSession) -> ContradictionListResponse:
     """
     Detects direct contradictions between claims in the draft and the existing knowledge graph.
     It extracts claims, searches for conflicting information, and reports any discrepancies.
@@ -221,7 +221,7 @@ async def contradiction_detector(draft_text: str, db: AsyncSession) -> list[Cont
     for claim in claims:
         # 2. Search: Find potentially contradictory information.
         # We frame the search query to look for opposing views.
-        search_query = f"Find evidence that contradicts the claim: '{claim}'"
+        search_query = claim
         context_from_kg = await kg_search_service.search_and_explain(search_query, db)
         
         if not context_from_kg or "No matching paragraphs" in context_from_kg[0]:
@@ -239,17 +239,18 @@ async def contradiction_detector(draft_text: str, db: AsyncSession) -> list[Cont
         ---
         {context_str}
         ---
-
-        If there is a direct contradiction, create a list of JSON objects describing it. If not, return an empty list for the 'contradictions' key.
-        Respond with a JSON object with a "contradictions" key, where the value is a list of objects conforming to the ContradictionAnalysis schema.
-        For each contradiction, identify the draft finding, the corpus paper ID (if available in the context), the corpus finding, and a feedback explaining the conflict.
+        Identify the paper title in the corpus that catches the contradiction or conflict.
+        Provide a helpful feedback explaining the conflict or contradiction.
+        Highlight the contradictory finding or text from the corpus.
         """
         # We expect a list of contradictions, as one claim might contradict multiple sources.
         contradictions_response = await kg_helper_service._generate_structured_content(
             judgement_prompt, 
-            response_model=ContradictionListResponse
+            response_model=ContradictionAnalysis
         )
-        if contradictions_response and contradictions_response.contradictions:
-            all_contradictions.extend(contradictions_response.contradictions)
+        contradictions_response.draft_finding = claim
+
+        if contradictions_response:
+            all_contradictions.append(contradictions_response)
         
-    return all_contradictions
+    return ContradictionListResponse(contradictions=all_contradictions)
