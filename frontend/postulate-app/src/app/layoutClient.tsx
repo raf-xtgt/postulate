@@ -56,7 +56,7 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
           ))}
         </ul>
 
-        <div className="text-sm">{user ? user.name : "Guest"}</div>
+        <div className="text-sm">{user?.name || "Guest"}</div>
       </nav>
 
       {/* Main Content Area */}
