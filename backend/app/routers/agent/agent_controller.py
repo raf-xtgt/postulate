@@ -6,6 +6,7 @@ from app.models.knowledge_graph.api_dto import CitationDto, PitfallDto
 from app.models.knowledge_graph.agent_response import ResearchCoachResponse
 from app.agents.section_classifier_agent import SectionClassifierAgent
 from app.agents.research_coach_agent import ResearchCoachAgent
+from app.services.knowledge_graph.kg_helper_service import KGHelperService
 
 router = APIRouter(
     prefix="/agent",
@@ -36,11 +37,11 @@ async def search_for_pitfalls(
         to detect research pitfalls and assess significance.
     """
     # Step 1: Trigger the Section Classifier Agent to understand the draft's structure.
-    section_classifier = SectionClassifierAgent()
-    classification_response = await section_classifier.classify_sections(draft_text.draft_text)
-    
+    section_classifier = SectionClassifierAgent(name="section_classifier_agent", kg_helper_service=KGHelperService())
+    classification_response = await section_classifier.classify_sections(draft_text.draft_paper)
+    print("classification response", classification_response)
     # Step 2: Pass the structured information to the Research Coach Agent for deep analysis.
-    research_coach = ResearchCoachAgent(db)
-    final_analysis = await research_coach.analyze_draft(classification_response)
+    # research_coach = ResearchCoachAgent(db)
+    # final_analysis = await research_coach.analyze_draft(classification_response)
     
     return final_analysis

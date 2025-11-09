@@ -3,6 +3,8 @@ from app.models.knowledge_graph.agent_response import SequenceClassificationResp
 from app.services.knowledge_graph.kg_helper_service import KGHelperService
 
 class SectionClassifierAgent(Agent):
+    kg_helper_service: KGHelperService
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.kg_helper_service = KGHelperService()
