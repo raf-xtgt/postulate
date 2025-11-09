@@ -43,32 +43,19 @@ class SequenceClassificationResponse(BaseModel):
 
 class NoveltyAnalysis(BaseModel):
     """Provides a score and context for the novelty of claims in the draft."""
-    status: Literal["novel", "iterative", "needs_review"] = Field(
-        ..., 
-        description="A high-level assessment of the finding's novelty."
-    )
-    score: float = Field(
-        ..., 
-        ge=0.0, 
-        le=1.0, 
-        description="A score from 0.0 (not novel) to 1.0 (highly novel) based on the corpus."
-    )
-    message: str = Field(
+    score: float 
+    feedback: str = Field(
         ..., 
         description="A clear, actionable message. E.g., 'This appears novel, but consider citing Y on similar methodology.'"
     )
-    supporting_claim_text: Optional[str] = Field(
-        None, 
-        description="The specific text from the draft identified as the primary claim being scored."
-    )
+    supporting_claim_text: None | str
     
     model_config = ConfigDict(
         json_schema_extra={
-            'example': {
-                'status': 'novel',
-                'score': 0.85,
-                'message': "This finding appears highly novel. Your claim about 'X' extends beyond the findings of Smith (2023) on similar methodology.",
-                'supporting_claim_text': "Our new algorithm achieves 95% accuracy, a significant leap."
+            'properties': {
+                'score': {'description': 'A score from 0.0 (not novel) to 1.0 (highly novel) based on the corpus.'},
+                'feedback': {'description':"A clear, actionable message for the provided score. E.g., 'This appears novel, but consider citing Y on similar methodology.'"} ,
+                'supporting_claim_text':  {'description':"The specific text from the draft identified as the primary claim being scored. E.g., Our new algorithm achieves '95%' accuracy, a significant leap. "} 
             }
         }
     )

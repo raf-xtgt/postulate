@@ -17,8 +17,8 @@ class KGSearchService:
         if entity.entity_type in ["ResearchPaper", "Section"]:
             return entity.name
         if entity.entity_type == "Paragraph":
-            content = entity.content.strip()
-            return content[:80] + '...' if len(content) > 80 else content
+            content = entity.content
+            return content
         # For other types like Claim, Methodology, use name. Fallback to content.
         return entity.name if entity.name else entity.content
 
