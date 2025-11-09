@@ -8,6 +8,7 @@ class PaperDetails(BaseModel):
     authors: List[str]
     publication_venue: None | str
     year: None | int
+    summary: None | str
     
     model_config = ConfigDict(
         json_schema_extra={
@@ -16,6 +17,7 @@ class PaperDetails(BaseModel):
                 'authors': {'description': 'A list of all author names.'},
                 'publication_venue': {'description': 'The journal, conference, or publication venue.'},
                 'year': {'description': 'The publication year.'},
+                'summary': {'description': 'A concise summary of the paper in maximum 50 words'},
             }
         }
     )

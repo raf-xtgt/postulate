@@ -146,9 +146,10 @@ class KGService:
         """Executes Round 1: Create ResearchPaper Entity"""
         prompt = f"""
         Extract the metadata from the following research paper.
+        Generate a concise summary of the research in 50 words.
 
         Text:
-        {text_content[:8000]} 
+        {text_content} 
         """
         try:
             details = await self.helper_service._generate_structured_content(prompt, PaperDetails)
@@ -159,7 +160,8 @@ class KGService:
                 f"Title: {details.title}\n"
                 f"Authors: {', '.join(details.authors)}\n"
                 f"Venue: {details.publication_venue}\n"
-                f"Year: {details.year}"
+                f"Year: {details.year}\n"
+                f"Summary: {details.summary}"
             )
             
             entity = await self.helper_service._create_entity(

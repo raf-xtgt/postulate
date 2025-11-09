@@ -33,7 +33,7 @@ class ContradictionListResponse(BaseModel):
     """A Pydantic model for a list of contradiction analyses."""
     contradictions: List[ContradictionAnalysis]
 
-async def novelty_analyzer(draft_text: str, db: AsyncSession) -> NoveltyAnalysis:
+async def novelty_analyzer(draft_text: str, db: AsyncSession):
     """
     Analyzes the novelty of the main claim in a research draft.
     It extracts the core claim, searches for related concepts in the knowledge graph,
@@ -54,38 +54,46 @@ async def novelty_analyzer(draft_text: str, db: AsyncSession) -> NoveltyAnalysis
         response_model=SingleStringResponse
     )
     main_claim = main_claim_response.response if main_claim_response else ""
+    print("main claim")
+    print(main_claim)
 
-    # 2. Search: Find related information in the knowledge graph.
+    # # 2. Search: Find related information in the knowledge graph.
     context_from_kg = await kg_search_service.search_and_explain(main_claim, db)
-    context_str = "\n".join(context_from_kg)
+    print("\nKG search against main claim")
+    for c in context_from_kg:
+        print(c)
+        print("\n")
+    # context_str = "\n".join(context_from_kg)
+    # print(context_str)
 
-    # 3. Compare: Use LLM to judge novelty based on the claim and KG context.
-    judgement_prompt = f"""
-    You are an expert peer reviewer. Your task is to assess the novelty of a research claim based on existing literature.
+    # # 3. Compare: Use LLM to judge novelty based on the claim and KG context.
+    # judgement_prompt = f"""
+    # You are an expert peer reviewer. Your task is to assess the novelty of a research claim based on existing literature.
 
-    Research Claim: "{main_claim}"
+    # Research Claim: "{main_claim}"
 
-    Existing Knowledge from Corpus:
-    ---
-    {context_str}
-    ---
+    # Existing Knowledge from Corpus:
+    # ---
+    # {context_str}
+    # ---
 
-    Based on the existing knowledge, assess the novelty of the research claim.
-    Respond with a JSON object that conforms to the NoveltyAnalysis schema.
-    """
-    novelty_analysis = await kg_helper_service._generate_structured_content(
-        judgement_prompt, 
-        response_model=NoveltyAnalysis
-    )
+    # Based on the existing knowledge, assess the novelty of the research claim.
+    # Respond with a JSON object that conforms to the NoveltyAnalysis schema.
+    # """
+    # novelty_analysis = await kg_helper_service._generate_structured_content(
+    #     judgement_prompt, 
+    #     response_model=NoveltyAnalysis
+    # )
     
-    if novelty_analysis:
-        # Ensure the supporting text is the claim we identified
-        novelty_analysis.supporting_claim_text = main_claim.strip()
-    else:
-        # Handle error case, return a default/empty analysis
-        novelty_analysis = NoveltyAnalysis(score=0, feedback="Analysis failed.", supporting_claim_text=main_claim.strip())
+    # if novelty_analysis:
+    #     # Ensure the supporting text is the claim we identified
+    #     novelty_analysis.supporting_claim_text = main_claim.strip()
+    # else:
+    #     # Handle error case, return a default/empty analysis
+    #     novelty_analysis = NoveltyAnalysis(score=0, feedback="Analysis failed.", supporting_claim_text=main_claim.strip())
     
-    return novelty_analysis
+    # return novelty_analysis
+    return "novelty"
 
 async def methodology_analyzer(draft_text: str, db: AsyncSession) -> MethodologyAnalysis:
     """

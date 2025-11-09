@@ -106,11 +106,11 @@ class KGHelperService:
         if chunk_type == "sections":
             # This is now the FALLBACK logic if docling fails
             prompt = f"""
-            Split the following research paper text into its main sections (e.g., Introduction, Methodology, Results, Conclusion, References).
+            Split the following research paper text into its main sections (e.g., Abstract, Introduction, Methodology, Results, Conclusion, References).
             Ensure the 'section_text' field contains the full text of that section.
 
             Text:
-            {text[:10000]}
+            {text}
             """
             return await self._generate_structured_content(prompt, SectionChunkList)
         

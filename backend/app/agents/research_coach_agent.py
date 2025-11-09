@@ -1,7 +1,7 @@
 import asyncio
 from google.adk.agents import Agent  
 from sqlalchemy.ext.asyncio import AsyncSession
-
+import json
 from app.models.knowledge_graph.agent_response import (
     SequenceClassificationResponse,
     ResearchCoachResponse,
@@ -42,38 +42,10 @@ class ResearchCoachAgent(Agent):
         # --- Concurrently trigger the required analysis tools ---
         
         tasks = {
-            "novelty": novelty_analyzer(draft_text=draft_text, db=self.db),
-            "significance": significance_analyzer(draft_text=draft_text, db=self.db)
+            "novelty": await novelty_analyzer(draft_text=draft_text, db=self.db),
         }
+        print("\n novelty and significance \n")
+        print(tasks)
 
-        # Conditionally add methodology analysis to the task list
-        if sections.has_methodology:
-            tasks["methodology"] = methodology_analyzer(draft_text=draft_text, db=self.db)
-        
-        # Conditionally add contradiction detection to the task list
-        if sections.has_results:
-            tasks["contradictions"] = contradiction_detector(draft_text=draft_text, db=self.db)
 
-        # Await all selected tasks to run in parallel
-        results = await asyncio.gather(*tasks.values())
-        
-        # Map results back to their keys
-        analysis_results = dict(zip(tasks.keys(), results))
-
-        # --- Assemble the final response from the tool outputs ---
-
-        # Methodology is optional, so we get it from the dict if it exists
-        methodology_result = analysis_results.get("methodology")
-        
-        # Contradictions are also optional
-        contradiction_result = analysis_results.get("contradictions", [])
-
-        final_response = ResearchCoachResponse(
-            draft_text=draft_text,
-            novelty_analysis=analysis_results["novelty"],
-            significance_analysis=analysis_results["significance"],
-            methodology_analysis=methodology_result,
-            contradiction_alerts=contradiction_result,
-        )
-
-        return final_response
+        return "coach agent response"
