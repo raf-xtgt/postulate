@@ -15,6 +15,7 @@ from app.agents.adk_tools import (
 )
 
 class ResearchCoachAgent(Agent):
+    db: AsyncSession
     def __init__(self, db: AsyncSession, **kwargs):
         super().__init__(
             tools=[
@@ -23,9 +24,10 @@ class ResearchCoachAgent(Agent):
                 significance_analyzer,
                 contradiction_detector,
             ],
+            db=db,
             **kwargs
         )
-        self.db = db
+  
 
     async def analyze_draft(self, classification_response: SequenceClassificationResponse) -> ResearchCoachResponse:
         """
