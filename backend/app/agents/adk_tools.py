@@ -152,7 +152,7 @@ async def significance_analyzer(draft_text: str, db: AsyncSession) -> Significan
     """
     # 1. Understand: Extract the contribution statement.
     extraction_prompt = f"""
-    What is the stated contribution or "why this matters" in the draft below?
+    What is the stated contribution or the significance or the draft below? Identify the text answering: "Why does the research matter?"
     Draft:
     ---
     {draft_text}
@@ -165,34 +165,31 @@ async def significance_analyzer(draft_text: str, db: AsyncSession) -> Significan
     )
     contribution_text = contribution_text_response.response if contribution_text_response else ""
 
-    # 2. Search: Find context about the research area/problem.
-    context_from_kg = await kg_search_service.search_and_explain(contribution_text or draft_text, db)
-    context_str = "\n".join(context_from_kg)
-
     # 3. Compare: Use LLM to judge the clarity and impact of the contribution.
     judgement_prompt = f"""
-    You are a journal editor. Is the significance of the following research clear and impactful?
-
+    You are an expert academic reviewer. Your task is to analyze the provided draft of a research paper, specifically focusing on how effectively it addresses the question: "**Why does this research matter?**" and highlights its **significance**.
+    
+    Draft:
+    ---
+    {draft_text}
+    ---
     Stated Contribution: "{contribution_text}"
 
-    Context from the field:
-    ---
-    {context_str}
-    ---
+    **Analysis Criteria:**
+    1.  **Clarity:** Is the significance immediately obvious to the reader?
+    2.  **Impact:** Does the paper explain *who* will benefit and *how* they will benefit (e.g., theoretically, methodologically, practically, or for policy)?
+    3.  **Scope:** Does the paper adequately explain how the research fills a gap or solves a problem described in the introduction/literature review?
 
-    Assess the significance. Respond with a JSON object that conforms to the SignificanceAnalysis schema.
     """
     significance_analysis = await kg_helper_service._generate_structured_content(
         judgement_prompt, 
         response_model=SignificanceAnalysis
     )
-    if significance_analysis:
-        significance_analysis.supporting_text = contribution_text.strip()
-    else:
+    if not significance_analysis:
         significance_analysis = SignificanceAnalysis(
-            is_clear=False,
+            status=None,
             feedback="Analysis failed.",
-            supporting_text=contribution_text.strip()
+            significance=None
         )
     return significance_analysis
 

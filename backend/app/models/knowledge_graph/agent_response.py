@@ -98,25 +98,16 @@ class ContradictionAnalysis(BaseModel):
 
 class SignificanceAnalysis(BaseModel):
     """Assesses whether the paper's 'why this matters' (contribution) is clearly stated."""
-    status: Literal["clear", "weak", "missing"] = Field(
-        ..., 
-        description="Assessment of the contribution's clarity and impact."
-    )
-    message: str = Field(
-        ..., 
-        description="Feedback on strengthening the impact. E.g., 'The impact would be clearer if you contrast with current limitations.'"
-    )
-    supporting_text: Optional[str] = Field(
-        None, 
-        description="The specific text from the draft identified as the contribution/impact statement (or lack thereof)."
-    )
+    status: None | str
+    significance: None | str
+    feedback: None | List[str]
 
     model_config = ConfigDict(
         json_schema_extra={
-            'example': {
-                'status': 'weak',
-                'message': "The contribution is stated, but its impact would be clearer if you directly contrasted your results with the primary limitations in the field you're addressing.",
-                'supporting_text': "This work provides a new method for analysis."
+            'properties': {
+                'status': {'description': "Assessment of whether the the research significance is clearly and compellingly highlighted. Apply one of the following status: 'clear', 'weak', 'missing'."},
+                'significance': {'description': "Concise reason for the provided status. "},
+                'feedback': {'description': "A list of 2-3 specific, actionable steps to improve the clarity and impact of the research significance statement"} ,
             }
         }
     )

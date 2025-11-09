@@ -6,6 +6,7 @@ from app.models.knowledge_graph.api_dto import CitationDto, PitfallDto
 from app.models.knowledge_graph.agent_response import ResearchCoachResponse
 from app.agents.section_classifier_agent import SectionClassifierAgent
 from app.agents.research_coach_agent import ResearchCoachAgent
+from app.agents.contribution_clarification_agent import ContributionClarificationAgent
 from app.services.knowledge_graph.kg_helper_service import KGHelperService
 from app.agents.adk_tools import (
     novelty_analyzer,
@@ -49,5 +50,16 @@ async def search_for_pitfalls(
     # Step 2: Pass the structured information to the Research Coach Agent for deep analysis.
     research_coach = ResearchCoachAgent(db=dbConn, name="research_coach_agent")
     final_analysis = await research_coach.analyze_draft(classification_response)
+    
+    return final_analysis
+
+
+@router.post("/significance-clarification")
+async def search_for_significance_clarification(
+    draft_text: PitfallDto,
+    dbConn: AsyncSession = Depends(get_db)
+):
+    research_coach = ContributionClarificationAgent(db=dbConn, name="contribution_clarification_agent")
+    final_analysis = await research_coach.analyze_draft(draft_text.draft_paper)
     
     return final_analysis
