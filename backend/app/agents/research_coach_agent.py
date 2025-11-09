@@ -43,9 +43,18 @@ class ResearchCoachAgent(Agent):
         
         tasks = {
             "novelty": await novelty_analyzer(draft_text=draft_text, db=self.db),
+            # "significance": await significance_analyzer(draft_text=draft_text, db=self.db)
+
         }
         print("\n novelty and significance \n")
         print(tasks)
 
+
+        # Conditionally add methodology analysis to the task list
+        if sections.has_methodology:
+            tasks["methodology"] = await methodology_analyzer(draft_text=draft_text, db=self.db)
+        
+        print("\n methodology \n")
+        print(tasks)
 
         return "coach agent response"

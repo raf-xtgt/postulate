@@ -44,17 +44,14 @@ class SequenceClassificationResponse(BaseModel):
 class NoveltyAnalysis(BaseModel):
     """Provides a score and context for the novelty of claims in the draft."""
     score: float 
-    feedback: str = Field(
-        ..., 
-        description="A clear, actionable message. E.g., 'This appears novel, but consider citing Y on similar methodology.'"
-    )
+    feedback: str 
     supporting_claim_text: None | str
     
     model_config = ConfigDict(
         json_schema_extra={
             'properties': {
                 'score': {'description': 'A score from 0.0 (not novel) to 1.0 (highly novel) based on the corpus.'},
-                'feedback': {'description':"A clear, actionable message for the provided score. E.g., 'This appears novel, but consider citing Y on similar methodology.'"} ,
+                'feedback': {'description':"A clear, actionable feedback for the provided score. E.g., 'This appears novel, but consider citing Y on similar methodology.'"} ,
                 'supporting_claim_text':  {'description':"The specific text from the draft identified as the primary claim being scored. E.g., Our new algorithm achieves '95%' accuracy, a significant leap. "} 
             }
         }
@@ -62,33 +59,24 @@ class NoveltyAnalysis(BaseModel):
 
 class MethodologyAnalysis(BaseModel):
     """Analyzes the alignment between the described methodology and the research claims."""
-    status: Literal["aligned", "misaligned", "unclear"] = Field(
-        ..., 
-        description="Assessment of whether the methods logically support the claims."
-    )
-    message: str = Field(
-        ..., 
-        description="Actionable feedback. E.g., 'This method is appropriate for X, but consider addressing limitation Y.'"
-    )
-    method_text: Optional[str] = Field(
-        None, 
-        description="The specific text from the draft identified as the methodology description."
-    )
-    claim_text: Optional[str] = Field(
-        None, 
-        description="The specific claim text this methodology is being compared against."
-    )
-
+    status: str
+    feedback: str 
     model_config = ConfigDict(
         json_schema_extra={
-            'example': {
-                'status': 'misaligned',
-                'message': "The qualitative interview method described is appropriate for 'why' questions, but doesn't fully support your quantitative claim about 'how often' this occurs.",
-                'method_text': "We conducted 10 semi-structured interviews...",
-                'claim_text': "...proving this phenomenon is widespread."
+            'properties': {
+                'status': {'description': "Assessment of whether the methods logically support the claims. Apply one of the following status to the claim : 'aligned', 'misaligned' , 'unclear'."},
+                'feedback': {'description': "Your feedback on the question: Does the methodology align with the claim? "} ,
+                
             }
         }
     )
+
+class MethodologyAnalysisOutput(BaseModel):
+    """Analyzes the alignment between the described methodology and the research claims."""
+    method_text:  None | str 
+    claim_text:  None | str
+    status:  None | str
+    feedback:  None | str 
 
 class ContradictionAnalysis(BaseModel):
     """Details a specific contradiction found between the draft and the cited corpus."""

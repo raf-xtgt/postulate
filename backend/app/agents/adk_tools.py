@@ -9,6 +9,7 @@ from app.models.knowledge_graph.agent_response import (
     MethodologyAnalysis,
     SignificanceAnalysis,
     ContradictionAnalysis,
+    MethodologyAnalysisOutput
 )
 
 # Initialize the services to be used by all tools
@@ -81,8 +82,8 @@ async def novelty_analyzer(draft_text: str, db: AsyncSession):
 
     Based on the existing knowledge, assess the novelty of the research claim. 
     Apply a score between 0.0 and 1.0 where a higher score means highly novel.
+    Provide a clear, actionable feedback for the provided score.
 
-    Respond with a JSON object that conforms to the NoveltyAnalysis schema.
     """
     novelty_analysis = await kg_helper_service._generate_structured_content(
         judgement_prompt, 
@@ -98,7 +99,7 @@ async def novelty_analyzer(draft_text: str, db: AsyncSession):
     
     return novelty_analysis
 
-async def methodology_analyzer(draft_text: str, db: AsyncSession) -> MethodologyAnalysis:
+async def methodology_analyzer(draft_text: str, db: AsyncSession) -> MethodologyAnalysisOutput:
     """
     Analyzes the alignment between the methodology and claims in a research draft.
     It extracts both components, searches for context, and uses an LLM to assess alignment.
@@ -136,23 +137,27 @@ async def methodology_analyzer(draft_text: str, db: AsyncSession) -> Methodology
     {context_str}
     ---
 
-    Does the methodology align with the claim? Respond with a JSON object that conforms to the MethodologyAnalysis schema.
+    Does the methodology align with the claim? Provide a clear, actionable feedback for the provided status. 
+    Apply one of the following status to the claim : 'aligned', 'misaligned' , 'unclear'.    
     """
     methodology_analysis = await kg_helper_service._generate_structured_content(
         judgement_prompt, 
         response_model=MethodologyAnalysis
     )
+    output = MethodologyAnalysisOutput(method_text="", claim_text="", status="", feedback="")
     if methodology_analysis:
-        methodology_analysis.method_text = method_text
-        methodology_analysis.claim_text = claim_text
+        output.method_text = method_text
+        output.claim_text = claim_text
+        output.status = methodology_analysis.status
+        output.feedback = methodology_analysis.feedback
     else:
-        methodology_analysis = MethodologyAnalysis(
+        methodology_analysis = MethodologyAnalysisOutput(
             is_aligned=False,
             feedback="Analysis failed.",
             method_text=method_text,
             claim_text=claim_text
         )
-    return methodology_analysis
+    return output
 
 
 async def significance_analyzer(draft_text: str, db: AsyncSession) -> SignificanceAnalysis:
