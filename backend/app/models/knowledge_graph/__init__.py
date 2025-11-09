@@ -4,3 +4,4 @@ from .graph_extraction import *
 from .paper_segement import *
 from .api_dto import *
 from .agent_response import *
+from .agent_dto import *

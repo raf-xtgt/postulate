@@ -11,28 +11,13 @@ from app.models.knowledge_graph.agent_response import (
     ContradictionAnalysis,
     MethodologyAnalysisOutput
 )
+from app.models.knowledge_graph.agent_dto import *
 
 # Initialize the services to be used by all tools
 kg_helper_service = KGHelperService()
 kg_search_service = KGSearchService()
 
-# Pydantic models for structured responses from the LLM
-class SingleStringResponse(BaseModel):
-    """A Pydantic model for a single string response."""
-    response: str
 
-class MethodClaimResponse(BaseModel):
-    """A Pydantic model for extracting method and claim text."""
-    method_text: str
-    claim_text: str
-
-class ClaimListResponse(BaseModel):
-    """A Pydantic model for a list of claims."""
-    claims: List[str]
-
-class ContradictionListResponse(BaseModel):
-    """A Pydantic model for a list of contradiction analyses."""
-    contradictions: List[ContradictionAnalysis]
 
 async def novelty_analyzer(draft_text: str, db: AsyncSession):
     """
@@ -257,7 +242,7 @@ async def contradiction_detector(draft_text: str, db: AsyncSession) -> list[Cont
 
         If there is a direct contradiction, create a list of JSON objects describing it. If not, return an empty list for the 'contradictions' key.
         Respond with a JSON object with a "contradictions" key, where the value is a list of objects conforming to the ContradictionAnalysis schema.
-        For each contradiction, identify the draft finding, the corpus paper ID (if available in the context), the corpus finding, and a message.
+        For each contradiction, identify the draft finding, the corpus paper ID (if available in the context), the corpus finding, and a feedback explaining the conflict.
         """
         # We expect a list of contradictions, as one claim might contradict multiple sources.
         contradictions_response = await kg_helper_service._generate_structured_content(

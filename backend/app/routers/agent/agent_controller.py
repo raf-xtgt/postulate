@@ -27,7 +27,7 @@ async def citation_search(
     return "Endpoint to trigger the citation agent"
 
 
-@router.post("/pitfall-analysis", response_model=ResearchCoachResponse)
+@router.post("/pitfall-analysis")
 async def search_for_pitfalls(
     draft_text: PitfallDto,
     dbConn: AsyncSession = Depends(get_db)

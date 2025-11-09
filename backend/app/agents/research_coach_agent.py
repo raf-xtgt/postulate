@@ -29,7 +29,7 @@ class ResearchCoachAgent(Agent):
         )
   
 
-    async def analyze_draft(self, classification_response: SequenceClassificationResponse) -> ResearchCoachResponse:
+    async def analyze_draft(self, classification_response: SequenceClassificationResponse) :
         """
         Analyzes a research draft for pitfalls and significance by conditionally running analysis tools.
         
@@ -54,7 +54,11 @@ class ResearchCoachAgent(Agent):
         if sections.has_methodology:
             tasks["methodology"] = await methodology_analyzer(draft_text=draft_text, db=self.db)
         
-        print("\n methodology \n")
+        if sections.has_results:
+            tasks["contradictions"] =await contradiction_detector(draft_text=draft_text, db=self.db)
+
+        print("\n contradiction \n")
         print(tasks)
 
-        return "coach agent response"
+        
+        return tasks

@@ -80,30 +80,18 @@ class MethodologyAnalysisOutput(BaseModel):
 
 class ContradictionAnalysis(BaseModel):
     """Details a specific contradiction found between the draft and the cited corpus."""
-    draft_finding: str = Field(
-        ..., 
-        description="The specific finding or claim text from the user's draft."
-    )
-    corpus_paper_id: str = Field(
-        ..., 
-        description="The identifier (e.g., 'Smith 2019' or a UUID) of the contradictory paper in the corpus."
-    )
-    corpus_finding: str = Field(
-        ..., 
-        description="The specific contradictory finding or text from the corpus paper."
-    )
-    message: str = Field(
-        ..., 
-        description="A helpful message explaining the conflict. E.g., 'This finding contradicts Smith 2019 on point Z.'"
-    )
+    draft_finding: None | str 
+    corpus_paper_id: None | str 
+    corpus_finding: None | str
+    feedback: None | str
 
     model_config = ConfigDict(
         json_schema_extra={
-            'example': {
-                'draft_finding': "We found that X increases Y.",
-                'corpus_paper_id': "Jones et al. 2022",
-                'corpus_finding': "In our study, X was found to decrease Y under similar conditions.",
-                'message': "Your finding that 'X increases Y' directly contradicts Jones et al. 2022, who found the opposite. Consider discussing this discrepancy."
+            'properties': {
+                'draft_finding': {'description': "The specific finding or claim text from the user's draft paper. E.g.,'We found that X increases Y." },
+                'corpus_paper_id': {'description': "The name of the contradictory paper from the corpus."},
+                'feedback': {'description': "A helpful feedback explaining the conflict. E.g., 'This finding contradicts Smith 2019 on point Z.'"} ,
+                'corpus_finding': {'description': "The specific contradictory finding or text from the corpus paper."}
             }
         }
     )
@@ -154,12 +142,12 @@ class ResearchCoachResponse(BaseModel):
         description="Analysis of the draft's novelty compared to the corpus."
     )
     
-    methodology_analysis: Optional[MethodologyAnalysis] = Field(
+    methodology_analysis: Optional[MethodologyAnalysisOutput] = Field(
         None,
         description="Analysis of method-claim alignment. Null if 'has_methodology' was false."
     )
     
-    significance_analysis: SignificanceAnalysis = Field(
+    significance_analysis: Optional[SignificanceAnalysis] = Field(
         ...,
         description="Analysis of the draft's contribution and 'why it matters'."
     )
