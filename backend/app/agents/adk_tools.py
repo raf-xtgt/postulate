@@ -1,8 +1,9 @@
-from adk.tools.tool import tool
-from adk.llm.vertex_ai_llm import VertexAILLM
 from sqlalchemy.ext.asyncio import AsyncSession
+from pydantic import BaseModel
+from typing import List
 
 from app.services.knowledge_graph.kg_search_service import KGSearchService
+from app.services.knowledge_graph.kg_helper_service import KGHelperService
 from app.models.knowledge_graph.agent_response import (
     NoveltyAnalysis,
     MethodologyAnalysis,
@@ -10,11 +11,28 @@ from app.models.knowledge_graph.agent_response import (
     ContradictionAnalysis,
 )
 
-# Initialize the LLM and Search Service once to be used by all tools
-llm = VertexAILLM()
+# Initialize the services to be used by all tools
+kg_helper_service = KGHelperService()
 kg_search_service = KGSearchService()
 
-@tool
+# Pydantic models for structured responses from the LLM
+class SingleStringResponse(BaseModel):
+    """A Pydantic model for a single string response."""
+    response: str
+
+class MethodClaimResponse(BaseModel):
+    """A Pydantic model for extracting method and claim text."""
+    method_text: str
+    claim_text: str
+
+class ClaimListResponse(BaseModel):
+    """A Pydantic model for a list of claims."""
+    claims: List[str]
+
+class ContradictionListResponse(BaseModel):
+    """A Pydantic model for a list of contradiction analyses."""
+    contradictions: List[ContradictionAnalysis]
+
 async def novelty_analyzer(draft_text: str, db: AsyncSession) -> NoveltyAnalysis:
     """
     Analyzes the novelty of the main claim in a research draft.
@@ -24,13 +42,18 @@ async def novelty_analyzer(draft_text: str, db: AsyncSession) -> NoveltyAnalysis
     # 1. Understand: Extract the main claim from the draft.
     claim_extraction_prompt = f"""
     Analyze the following research draft and extract the single, most important claim or finding.
+    Respond with a JSON object with a single key "response".
     Draft:
     ---
     {draft_text}
     ---
     What is the primary claim?
     """
-    main_claim = await llm.get_response(claim_extraction_prompt)
+    main_claim_response = await kg_helper_service._generate_structured_content(
+        claim_extraction_prompt, 
+        response_model=SingleStringResponse
+    )
+    main_claim = main_claim_response.response if main_claim_response else ""
 
     # 2. Search: Find related information in the knowledge graph.
     context_from_kg = await kg_search_service.search_and_explain(main_claim, db)
@@ -48,15 +71,22 @@ async def novelty_analyzer(draft_text: str, db: AsyncSession) -> NoveltyAnalysis
     ---
 
     Based on the existing knowledge, assess the novelty of the research claim.
+    Respond with a JSON object that conforms to the NoveltyAnalysis schema.
     """
-    novelty_analysis = await llm.get_structured_response(judgement_prompt, response_model=NoveltyAnalysis)
+    novelty_analysis = await kg_helper_service._generate_structured_content(
+        judgement_prompt, 
+        response_model=NoveltyAnalysis
+    )
     
-    # Ensure the supporting text is the claim we identified
-    novelty_analysis.supporting_claim_text = main_claim.strip()
+    if novelty_analysis:
+        # Ensure the supporting text is the claim we identified
+        novelty_analysis.supporting_claim_text = main_claim.strip()
+    else:
+        # Handle error case, return a default/empty analysis
+        novelty_analysis = NoveltyAnalysis(score=0, feedback="Analysis failed.", supporting_claim_text=main_claim.strip())
     
     return novelty_analysis
 
-@tool
 async def methodology_analyzer(draft_text: str, db: AsyncSession) -> MethodologyAnalysis:
     """
     Analyzes the alignment between the methodology and claims in a research draft.
@@ -70,13 +100,13 @@ async def methodology_analyzer(draft_text: str, db: AsyncSession) -> Methodology
     {draft_text}
     ---
     Respond with a JSON object with keys "method_text" and "claim_text".
-    """
-    extracted_texts = await llm.get_structured_response(
+    """@tool
+    extracted_texts = await kg_helper_service._generate_structured_content(
         extraction_prompt, 
-        response_model={"method_text": "...", "claim_text": "..."}
+        response_model=MethodClaimResponse
     )
-    method_text = extracted_texts.get("method_text", "")
-    claim_text = extracted_texts.get("claim_text", "")
+    method_text = extracted_texts.method_text if extracted_texts else ""
+    claim_text = extracted_texts.claim_text if extracted_texts else ""
 
     # 2. Search: Find related information for both method and claim.
     method_context = await kg_search_service.search_and_explain(method_text, db)
@@ -95,14 +125,25 @@ async def methodology_analyzer(draft_text: str, db: AsyncSession) -> Methodology
     {context_str}
     ---
 
-    Does the methodology align with the claim?
+    Does the methodology align with the claim? Respond with a JSON object that conforms to the MethodologyAnalysis schema.
     """
-    methodology_analysis = await llm.get_structured_response(judgement_prompt, response_model=MethodologyAnalysis)
-    methodology_analysis.method_text = method_text
-    methodology_analysis.claim_text = claim_text
+    methodology_analysis = await kg_helper_service._generate_structured_content(
+        judgement_prompt, 
+        response_model=MethodologyAnalysis
+    )
+    if methodology_analysis:
+        methodology_analysis.method_text = method_text
+        methodology_analysis.claim_text = claim_text
+    else:
+        methodology_analysis = MethodologyAnalysis(
+            is_aligned=False,
+            feedback="Analysis failed.",
+            method_text=method_text,
+            claim_text=claim_text
+        )
     return methodology_analysis
 
-@tool
+
 async def significance_analyzer(draft_text: str, db: AsyncSession) -> SignificanceAnalysis:
     """
     Assesses if the research draft clearly articulates its significance or contribution.
@@ -115,9 +156,13 @@ async def significance_analyzer(draft_text: str, db: AsyncSession) -> Significan
     ---
     {draft_text}
     ---
-    Extract the sentence(s) that describe the significance.
+    Extract the sentence(s) that describe the significance. Respond with a JSON object with a single key "response".
     """
-    contribution_text = await llm.get_response(extraction_prompt)
+    contribution_text_response = await kg_helper_service._generate_structured_content(
+        extraction_prompt, 
+        response_model=SingleStringResponse
+    )
+    contribution_text = contribution_text_response.response if contribution_text_response else ""
 
     # 2. Search: Find context about the research area/problem.
     context_from_kg = await kg_search_service.search_and_explain(contribution_text or draft_text, db)
@@ -134,13 +179,23 @@ async def significance_analyzer(draft_text: str, db: AsyncSession) -> Significan
     {context_str}
     ---
 
-    Assess the significance.
+    Assess the significance. Respond with a JSON object that conforms to the SignificanceAnalysis schema.
     """
-    significance_analysis = await llm.get_structured_response(judgement_prompt, response_model=SignificanceAnalysis)
-    significance_analysis.supporting_text = contribution_text.strip()
+    significance_analysis = await kg_helper_service._generate_structured_content(
+        judgement_prompt, 
+        response_model=SignificanceAnalysis
+    )
+    if significance_analysis:
+        significance_analysis.supporting_text = contribution_text.strip()
+    else:
+        significance_analysis = SignificanceAnalysis(
+            is_clear=False,
+            feedback="Analysis failed.",
+            supporting_text=contribution_text.strip()
+        )
     return significance_analysis
 
-@tool
+
 async def contradiction_detector(draft_text: str, db: AsyncSession) -> list[ContradictionAnalysis]:
     """
     Detects direct contradictions between claims in the draft and the existing knowledge graph.
@@ -153,9 +208,13 @@ async def contradiction_detector(draft_text: str, db: AsyncSession) -> list[Cont
     ---
     {draft_text}
     ---
-    Return a JSON list of strings, where each string is a claim.
+    Return a JSON object with a "claims" key containing a list of strings, where each string is a claim.
     """
-    claims = await llm.get_structured_response(extraction_prompt, response_model=list[str])
+    claims_response = await kg_helper_service._generate_structured_content(
+        extraction_prompt, 
+        response_model=ClaimListResponse
+    )
+    claims = claims_response.claims if claims_response else []
 
     all_contradictions = []
     for claim in claims:
@@ -180,11 +239,16 @@ async def contradiction_detector(draft_text: str, db: AsyncSession) -> list[Cont
         {context_str}
         ---
 
-        If there is a direct contradiction, describe it. If not, respond with "No contradiction".
+        If there is a direct contradiction, create a list of JSON objects describing it. If not, return an empty list for the 'contradictions' key.
+        Respond with a JSON object with a "contradictions" key, where the value is a list of objects conforming to the ContradictionAnalysis schema.
         For each contradiction, identify the draft finding, the corpus paper ID (if available in the context), the corpus finding, and a message.
         """
         # We expect a list of contradictions, as one claim might contradict multiple sources.
-        contradictions = await llm.get_structured_response(judgement_prompt, response_model=list[ContradictionAnalysis])
-        all_contradictions.extend(contradictions)
+        contradictions_response = await kg_helper_service._generate_structured_content(
+            judgement_prompt, 
+            response_model=ContradictionListResponse
+        )
+        if contradictions_response and contradictions_response.contradictions:
+            all_contradictions.extend(contradictions_response.contradictions)
         
     return all_contradictions

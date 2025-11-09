@@ -1,5 +1,5 @@
 planning
-backend/postulate_webservice_venv
+backend/postulate-venv
 backend/.env
 backend/app/postulate-creds.json
 backend/app/__pycache__

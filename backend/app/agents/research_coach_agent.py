@@ -1,6 +1,5 @@
 import asyncio
-from adk.agent import Agent
-from adk.llm.vertex_ai_llm import VertexAILLM
+from google.adk.agents import Agent  
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.knowledge_graph.agent_response import (
@@ -18,7 +17,6 @@ from app.agents.adk_tools import (
 class ResearchCoachAgent(Agent):
     def __init__(self, db: AsyncSession, **kwargs):
         super().__init__(
-            llm=VertexAILLM(),
             tools=[
                 novelty_analyzer,
                 methodology_analyzer,
