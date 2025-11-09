@@ -57,16 +57,34 @@ RELATIONSHIP_TYPES = Literal[
 
 class ClassifiedEntity(BaseModel):
     """An entity classified from a paragraph."""
-    entity_type: ENTITY_TYPES = Field(description="The type of the classified entity.")
-    relationship_type: RELATIONSHIP_TYPES = Field(description="The relationship from the paragraph to this entity.")
-    name: None | str
-    content: None | str
+    entity_type: ENTITY_TYPES = Field(
+        description="The type of the classified entity (e.g., 'Methodology', 'Claim', 'Result')."
+    )
+    relationship_type: RELATIONSHIP_TYPES = Field(
+        description="The relationship from the paragraph to this entity (e.g., 'USES', 'CITES', 'DEFINES')."
+    )
+    name: None | str = Field(
+        description="A short name for this entity (e.g., 'SVM', 'Main Claim', 'p-value', 'Author et al. [2023]')."
+    )
+    content: None | str = Field(
+        description="A summary of the entity's content as discussed in the paragraph, or the full citation text if it's a 'Citation'."
+    )
     
     model_config = ConfigDict(
         json_schema_extra={
             'properties': {
-                'name': {'description': "A short name for this entity (e.g., 'SVM', 'Main Claim', 'p-value', 'Author et al. [2023]')."},
-                'content': {'description': "A summary of the entity's content as discussed in the paragraph, or the full citation text if it's a 'Citation'."},
+                'entity_type': {
+                    'description': "The type of the classified entity (e.g., 'Methodology', 'Claim', 'Result')."
+                },
+                'relationship_type': {
+                    'description': "The relationship from the paragraph to this entity (e.g., 'USES', 'CITES', 'DEFINES')."
+                },
+                'name': {
+                    'description': "A short name for this entity (e.g., 'SVM', 'Main Claim', 'p-value', 'Author et al. [2023]')."
+                },
+                'content': {
+                    'description': "A summary of the entity's content as discussed in the paragraph, or the full citation text if it's a 'Citation'."
+                },
             }
         }
     )

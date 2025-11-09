@@ -239,6 +239,7 @@ class KGService:
             Valid Entity Types: {list(ENTITY_TYPES.__args__)}
             Valid Relationship Types: {list(RELATIONSHIP_TYPES.__args__)}
 
+            Select an entity and relationship type from the list above that matches your analysis. 
             Provide a short name to the entity. 
 
 
