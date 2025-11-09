@@ -100,7 +100,7 @@ async def methodology_analyzer(draft_text: str, db: AsyncSession) -> Methodology
     {draft_text}
     ---
     Respond with a JSON object with keys "method_text" and "claim_text".
-    """@tool
+    """
     extracted_texts = await kg_helper_service._generate_structured_content(
         extraction_prompt, 
         response_model=MethodClaimResponse

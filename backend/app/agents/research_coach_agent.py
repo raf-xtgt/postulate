@@ -42,17 +42,17 @@ class ResearchCoachAgent(Agent):
         # --- Concurrently trigger the required analysis tools ---
         
         tasks = {
-            "novelty": novelty_analyzer.execute(draft_text=draft_text, db=self.db),
-            "significance": significance_analyzer.execute(draft_text=draft_text, db=self.db)
+            "novelty": novelty_analyzer(draft_text=draft_text, db=self.db),
+            "significance": significance_analyzer(draft_text=draft_text, db=self.db)
         }
 
         # Conditionally add methodology analysis to the task list
         if sections.has_methodology:
-            tasks["methodology"] = methodology_analyzer.execute(draft_text=draft_text, db=self.db)
+            tasks["methodology"] = methodology_analyzer(draft_text=draft_text, db=self.db)
         
         # Conditionally add contradiction detection to the task list
         if sections.has_results:
-            tasks["contradictions"] = contradiction_detector.execute(draft_text=draft_text, db=self.db)
+            tasks["contradictions"] = contradiction_detector(draft_text=draft_text, db=self.db)
 
         # Await all selected tasks to run in parallel
         results = await asyncio.gather(*tasks.values())
