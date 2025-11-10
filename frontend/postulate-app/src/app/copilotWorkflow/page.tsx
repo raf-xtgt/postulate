@@ -6,7 +6,7 @@ import Editor from "../components/copilot/editor/editor";
 export default function CopilotWorkflow() {
 
   return (
-    <div className="p-5 h-full bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="p-5 h-full bg-gradient-to-br from-gray-50 to-gray-100 overflow-y-auto overflow-x-hidden" >
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-800">AI Research Co-Pilot</h1>
         <p className="text-gray-600 mt-1">Enhance your research workflow with AI-powered insights</p>

@@ -10,9 +10,8 @@ import Citation from "./citation/citation";
 export default function LlmMain() {
   const { docText } = useStateController();
 
-
   return (
-    <div className="h-full flex flex-col bg-gray-50 rounded-xl overflow-hidden">
+    <div className="h-full flex flex-col bg-gray-50 rounded-xl overflow-y-auto overflow-x-hidden">
       
       <div className="border-b border-gray-200 bg-white">
         <div className="p-4 flex items-center">
