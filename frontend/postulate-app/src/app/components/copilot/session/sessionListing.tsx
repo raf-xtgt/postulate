@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { FaPlus, FaSearch, FaFolderOpen, FaClock, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
+import { FaPlus, FaSearch, FaFolderOpen, FaClock, FaCheckCircle, FaExclamationCircle, FaQuoteRight } from 'react-icons/fa';
 import { SessionModel } from '@/app/models/session';
 import { SessionService } from '@/app/services/sessionService';
 import { useUser } from '@/app/context/userContext';
 import { useStateController } from '@/app/context/stateController';
 import AddSession from './addSession';
-import LibraryListing from '../library/libraryListing';
+import Citation from '../llmComponents/citation/citation';
 
 export default function SessionListing() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -184,10 +184,17 @@ export default function SessionListing() {
           </div>
         )}
 
-        {/* Chats Section */}
-        <div className="flex-1 overflow-y-auto mt-3">
-          <LibraryListing></LibraryListing>
-        </div>
+        
+        {/* Citation search here */}
+        <div className="border-gray-200 bg-white mt-4">
+          <div className="p-4 flex items-center">
+            <FaQuoteRight className="text-indigo-500 mr-2 text-lg" />
+            <h2 className="font-bold text-lg text-gray-800">Citations</h2>
+          </div>
+          <div>
+            <Citation />
+          </div>
+      </div>
 
       </div>
       <AddSession
