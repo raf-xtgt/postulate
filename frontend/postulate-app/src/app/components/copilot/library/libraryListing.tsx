@@ -81,7 +81,7 @@ export default function LibraryListing() {
             <div className="pb-4 border-b border-gray-200">
               <h2 className="font-bold text-lg mb-3 flex justify-between items-center text-gray-800">
                 <span className="flex items-center gap-2">
-                  <FaRegFolder className="text-indigo-600" /> Library Documents
+                  <FaRegFolder className="text-indigo-600" /> Documents in Research Knowledge Graph
                 </span>
                 <button 
                   onClick={() => setIsModalOpen(true)}

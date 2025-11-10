@@ -83,6 +83,22 @@ async def upload_multiple_files_to_gcs(
 
 
 
+@router.get("/list", response_model=list[PSFileItem])
+async def get_all_files(
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Retrieves a list of all uploaded files from the database.
+    Returns file metadata including guid, file_name, file_url, mime_type, and timestamps.
+    """
+    try:
+        files = await file_upload_service.get_all_files(db=db)
+        return files
+    except Exception as e:
+        print("error", e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.get("/{guid}")
 async def get_file_from_gcs(
     guid: str,
