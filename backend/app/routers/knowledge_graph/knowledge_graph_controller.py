@@ -29,7 +29,7 @@ async def construct_kg(
 ):
     """Endpoint to construct knowledge graph given a list of file guids"""
     await kg_service.construct_kg_from_files(file_guids, db)
-    return {"message": "Knowledge graph construction started."}
+    return {"message": "Document added to the Postulate knowledge graph."}
 
 @router.post("/search")
 async def search_kg(
