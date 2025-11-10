@@ -13,7 +13,7 @@ embedding_model = TextEmbeddingModel.from_pretrained(EMBEDDING_MODEL_NAME)
 
 class KGCitationSearchService:
 
-    async def citation_search(self, query: str, db: AsyncSession, k: int = 5) -> list[CitationResult]:
+    async def citation_search(self, query: str, db: AsyncSession, k: int = 3) -> list[CitationResult]:
         """
         Executes the 3-step citation search strategy:
         1. Semantic Seed Node Retrieval

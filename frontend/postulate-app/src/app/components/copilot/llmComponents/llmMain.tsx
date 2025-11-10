@@ -21,12 +21,15 @@ export default function LlmMain() {
         <Pitfall></Pitfall>
       </div>
 
-      <div className="border-t border-gray-200 bg-white mt-4">
+      <div className="border-gray-200 bg-white mt-4">
         <div className="p-4 flex items-center">
           <FaQuoteRight className="text-indigo-500 mr-2 text-lg" />
           <h2 className="font-bold text-lg text-gray-800">Citations</h2>
         </div>
-        <Citation />
+        <div>
+          <Citation />
+        </div>
+        
       </div>
     </div>
   );
