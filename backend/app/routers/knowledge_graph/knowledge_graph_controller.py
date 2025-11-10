@@ -7,6 +7,7 @@ from app.models.knowledge_graph.api_dto import *
 from app.config.db_config import get_db
 from app.services.knowledge_graph.knowledge_graph_service import KGService
 from app.services.knowledge_graph.kg_search_service import KGSearchService
+from app.services.knowledge_graph.kg_citation_search_service import KGCitationSearchService
 
 router = APIRouter(
     prefix="/kg",
@@ -15,6 +16,8 @@ router = APIRouter(
 
 kg_service = KGService()
 kg_search_service = KGSearchService()
+kg_citation_search_service = KGCitationSearchService()
+
 
 @router.post("/construct")
 async def construct_kg(
@@ -39,4 +42,11 @@ async def search_kg(
     """
     explanations = await kg_search_service.search_and_explain(search_query.query, db)
     return {"explanations": explanations}
+
+
+
+@router.post("/citation-search")
+async def citation_search_kg(search_query: KGSearchQuery, db: AsyncSession = Depends(get_db)):
+    search_results = await kg_citation_search_service.citation_search(search_query.query, db)
+    return {"citation_search": search_results}
 
