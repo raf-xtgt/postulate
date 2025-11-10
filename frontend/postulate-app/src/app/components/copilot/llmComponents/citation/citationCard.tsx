@@ -1,11 +1,14 @@
 import { CitationResultModel } from "@/app/models/citationResult";
-import { FaQuoteLeft, FaBook, FaUsers, FaCalendar, FaMapMarkerAlt, FaStar } from 'react-icons/fa';
+import { FaQuoteLeft, FaBook, FaUsers, FaCalendar, FaMapMarkerAlt, FaStar, FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { useState } from 'react';
 
 interface CitationCardProps {
     citation: CitationResultModel;
 }
 
 export default function CitationCard({ citation }: CitationCardProps) {
+    const [expanded, setExpanded] = useState(false);
+
     const getRelevanceColor = (score: number | null) => {
         if (!score) return 'text-gray-600';
         if (score >= 0.8) return 'text-green-600';
@@ -14,80 +17,89 @@ export default function CitationCard({ citation }: CitationCardProps) {
     };
 
     return (
-        <div className="bg-white shadow-lg rounded-xl p-5 border border-gray-200 transition-all duration-200 hover:shadow-xl">
-            <div className="flex items-start gap-3">
-                <div className="mt-1 text-indigo-500">
-                    <FaQuoteLeft />
-                </div>
-                <div className="flex-1">
-                    {/* Header with Title and Relevance Score */}
-                    <div className="flex items-start justify-between mb-3">
-                        <div className="flex-1">
-                            <h3 className="font-bold text-lg text-gray-800 mb-1">
-                                {citation.paper_title || 'Untitled Paper'}
-                            </h3>
-                        </div>
-                        {citation.relevance_score !== null && (
-                            <div className="flex items-center gap-1 ml-3">
-                                <FaStar className={getRelevanceColor(citation.relevance_score)} />
-                                <span className={`text-sm font-bold ${getRelevanceColor(citation.relevance_score)}`}>
-                                    {(citation.relevance_score * 100).toFixed(0)}%
+        <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-lg">
+            <button
+                aria-expanded={expanded}
+                onClick={() => setExpanded((s) => !s)}
+                className="w-full p-4 flex justify-between items-center bg-white hover:bg-gray-50 transition-colors"
+            >
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="p-2 bg-indigo-100 rounded-lg flex-shrink-0">
+                        <FaQuoteLeft className="text-indigo-600" />
+                    </div>
+                    <div className="text-left flex-1 min-w-0">
+                        <h3 className="font-bold text-gray-800 truncate">
+                            {citation.paper_title || 'Untitled Paper'}
+                        </h3>
+                        <div className="flex items-center gap-3 text-xs text-gray-600 mt-1">
+                            {citation.paper_authors && (
+                                <span className="flex items-center gap-1 truncate">
+                                    <FaUsers className="text-indigo-500 flex-shrink-0" />
+                                    <span className="truncate">{citation.paper_authors}</span>
                                 </span>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Paper Metadata */}
-                    <div className="space-y-2 mb-3">
-                        {citation.paper_authors && (
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                                <FaUsers className="text-indigo-500 flex-shrink-0" />
-                                <span className="italic">{citation.paper_authors}</span>
-                            </div>
-                        )}
-                        
-                        <div className="flex items-center gap-3 text-sm text-gray-600">
+                            )}
                             {citation.paper_year && (
-                                <div className="flex items-center gap-1">
+                                <span className="flex items-center gap-1 flex-shrink-0">
                                     <FaCalendar className="text-indigo-500" />
-                                    <span>{citation.paper_year}</span>
-                                </div>
-                            )}
-                            {citation.paper_venue && (
-                                <div className="flex items-center gap-1">
-                                    <FaMapMarkerAlt className="text-indigo-500" />
-                                    <span className="italic">{citation.paper_venue}</span>
-                                </div>
+                                    {citation.paper_year}
+                                </span>
                             )}
                         </div>
-                    </div>
-
-                    {/* Paragraph Text */}
-                    {citation.paragraph_text && (
-                        <div className="p-3 bg-gray-50 rounded-lg mb-3">
-                            <p className="text-sm text-gray-700 italic">"{citation.paragraph_text}"</p>
-                        </div>
-                    )}
-
-                    {/* Context Summary */}
-                    {citation.context_summary && (
-                        <div className="p-3 bg-indigo-50 rounded-lg mb-3 border border-indigo-100">
-                            <p className="text-sm text-gray-700">{citation.context_summary}</p>
-                        </div>
-                    )}
-
-                    {/* Footer */}
-                    <div className="flex items-center justify-between text-xs text-gray-500 uppercase tracking-wide pt-2 border-t border-gray-100">
-                        <span className="flex items-center gap-1">
-                            <FaBook className="text-indigo-400" />
-                            Citation #{citation.guid.substring(0, 8)}
-                        </span>
-                        <span>
-                            Added: {new Date(citation.created_date).toLocaleDateString()}
-                        </span>
                     </div>
                 </div>
-            </div>
+                <div className="flex items-center gap-3 flex-shrink-0 ml-3">
+                    {citation.relevance_score !== null && (
+                        <div className="flex items-center gap-1">
+                            <FaStar className={getRelevanceColor(citation.relevance_score)} />
+                            <span className={`text-sm font-bold ${getRelevanceColor(citation.relevance_score)}`}>
+                                {(citation.relevance_score * 100).toFixed(0)}%
+                            </span>
+                        </div>
+                    )}
+                    {expanded ? <FaChevronUp className="text-gray-500" /> : <FaChevronDown className="text-gray-500" />}
+                </div>
+            </button>
+
+            {expanded && (
+                <div className="p-5 bg-gray-50 border-t border-gray-200">
+                    <div className="space-y-4">
+                        {/* Venue Information */}
+                        {citation.paper_venue && (
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                <FaMapMarkerAlt className="text-indigo-500 flex-shrink-0" />
+                                <span className="italic">{citation.paper_venue}</span>
+                            </div>
+                        )}
+
+                        {/* Paragraph Text */}
+                        {citation.paragraph_text && (
+                            <div className="p-3 bg-white rounded-lg border border-gray-200">
+                                <h4 className="text-xs font-bold text-gray-500 uppercase mb-2">Relevant Excerpt</h4>
+                                <p className="text-sm text-gray-700 italic">"{citation.paragraph_text}"</p>
+                            </div>
+                        )}
+
+                        {/* Context Summary */}
+                        {citation.context_summary && (
+                            <div className="p-3 bg-indigo-50 rounded-lg border border-indigo-100">
+                                <h4 className="text-xs font-bold text-indigo-700 uppercase mb-2">Context Summary</h4>
+                                <p className="text-sm text-gray-700">{citation.context_summary}</p>
+                            </div>
+                        )}
+
+                        {/* Footer */}
+                        <div className="flex items-center justify-between text-xs text-gray-500 uppercase tracking-wide pt-3 border-t border-gray-200">
+                            <span className="flex items-center gap-1">
+                                <FaBook className="text-indigo-400" />
+                                Citation #{citation.guid.substring(0, 8)}
+                            </span>
+                            <span>
+                                Added: {new Date(citation.created_date).toLocaleDateString()}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
