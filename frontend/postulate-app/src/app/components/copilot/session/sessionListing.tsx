@@ -1,16 +1,18 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { FaPlus, FaSearch, FaFolderOpen, FaClock, FaCheckCircle, FaExclamationCircle, FaQuoteRight } from 'react-icons/fa';
+import { FaPlus, FaSearch, FaFolderOpen, FaClock, FaFileImport, FaCheckCircle, FaExclamationCircle, FaQuoteRight } from 'react-icons/fa';
 import { SessionModel } from '@/app/models/session';
 import { SessionService } from '@/app/services/sessionService';
 import { useUser } from '@/app/context/userContext';
 import { useStateController } from '@/app/context/stateController';
 import AddSession from './addSession';
+import LibraryModal from '../library/libraryModal';
 import Citation from '../llmComponents/citation/citation';
 
 export default function SessionListing() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSessionModalOpen, setIsSessionModalOpen] = useState(false);
+  const [isLibraryModalOpen, setIsLibraryModalOpen] = useState(false);
   const [sessions, setSessions] = useState<SessionModel[]>([]);
   const [selectedSession, setSelectedSession] = useState<SessionModel>();
   const [search, setSearch] = useState("");
@@ -52,7 +54,7 @@ export default function SessionListing() {
       setLoading(true);
       setError(null);
       setSuccessMessage(null);
-      
+
       const payload = {
         title: session.title,
         description: session.description,
@@ -66,7 +68,7 @@ export default function SessionListing() {
         setSessions(prev => [...prev, createdSession]);
         setCurrentSessionGuid(createdSession.guid);
         setSuccessMessage('Session created successfully!');
-        
+
         // Clear success message after 3 seconds
         setTimeout(() => setSuccessMessage(null), 3000);
       }
@@ -121,12 +123,26 @@ export default function SessionListing() {
             <span className="flex items-center gap-2">
               <FaFolderOpen className="text-indigo-600" /> Research Sessions
             </span>
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="flex items-center justify-center p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-              aria-label="Add session">
-              <FaPlus />
-            </button>
+
+            <div className="flex items-center gap-2">
+              {/* Add files button */}
+              <button
+                onClick={() => setIsLibraryModalOpen(true)}
+                className="flex items-center justify-center p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                aria-label="Add files">
+                <FaFileImport />
+              </button>
+
+              {/* Add session button */}
+              <button
+                onClick={() => setIsSessionModalOpen(true)}
+                className="flex items-center justify-center p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                aria-label="Add session">
+                <FaPlus />
+              </button>
+            </div>
+
+
           </h2>
 
           {/* Search input */}
@@ -148,8 +164,8 @@ export default function SessionListing() {
               <li
                 key={index} // 🔹 incremental numeric key
                 className={`p-3 rounded-lg cursor-pointer flex justify-between items-center relative transition-colors ${selectedSession?.guid === session.guid
-                    ? 'bg-indigo-100 border border-indigo-300'
-                    : 'bg-white border border-gray-200 hover:bg-gray-50'
+                  ? 'bg-indigo-100 border border-indigo-300'
+                  : 'bg-white border border-gray-200 hover:bg-gray-50'
                   }`}
                 onClick={() => {
                   setSelectedSession(session); // 🔹 store selected Session
@@ -184,7 +200,7 @@ export default function SessionListing() {
           </div>
         )}
 
-        
+
         {/* Citation search here */}
         <div className="border-gray-200 bg-white mt-4">
           <div className="p-4 flex items-center">
@@ -194,13 +210,21 @@ export default function SessionListing() {
           <div>
             <Citation />
           </div>
-      </div>
+        </div>
 
       </div>
+
+      {/* Add Session Modal */}
       <AddSession
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isSessionModalOpen}
+        onClose={() => setIsSessionModalOpen(false)}
         onSave={handleAddSession}
+      />
+
+      {/* Library Documents Modal */}
+      <LibraryModal
+        isOpen={isLibraryModalOpen}
+        onClose={() => setIsLibraryModalOpen(false)}
       />
     </div>
 
