@@ -26,6 +26,13 @@ interface StateControllerState {
   currentSessionGuid: string | null;
   setCurrentSessionGuid: (guid: string | null) => void;
 
+  // pitfalls
+  pitfalls: any[];
+  setPitfalls: (pitfalls: any[]) => void;
+  addPitfall: (pitfall: any) => void;
+  pitfallsLoading: boolean;
+  setPitfallsLoading: (loading: boolean) => void;
+
 }
 
 const StateControllerContext = createContext<StateControllerState | undefined>(undefined);
@@ -38,9 +45,15 @@ export const StateControllerProvider = ({ children }: { children: ReactNode }) =
   const [docText, addDocText] = useState<string>("");
   const [citations, setCitations] = useState<CitationModel[]>([]);
   const [currentSessionGuid, setCurrentSessionGuid] = useState<string | null>(null);
+  const [pitfalls, setPitfalls] = useState<any[]>([]);
+  const [pitfallsLoading, setPitfallsLoading] = useState<boolean>(false);
 
   const addCitation = (citation: CitationModel) => {
     setCitations(prev => [...prev, citation]);
+  };
+
+  const addPitfall = (pitfall: any) => {
+    setPitfalls(prev => [...prev, pitfall]);
   };
 
   return (
@@ -55,7 +68,12 @@ export const StateControllerProvider = ({ children }: { children: ReactNode }) =
       citations,
       addCitation,
       currentSessionGuid,
-      setCurrentSessionGuid
+      setCurrentSessionGuid,
+      pitfalls,
+      setPitfalls,
+      addPitfall,
+      pitfallsLoading,
+      setPitfallsLoading
     }}>
       {children}
     </StateControllerContext.Provider>

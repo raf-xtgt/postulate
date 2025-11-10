@@ -3,13 +3,17 @@
 import { useState, useRef } from 'react';
 import { useStateController } from '@/app/context/stateController';
 import { CitationModel } from '@/app/models/citation';
+import { InferenceService } from '@/app/services/inferenceService';
 import { FaBold, FaSearchengin, FaHighlighter, FaSearch, FaSave } from 'react-icons/fa';
 
 export default function Editor() {
-    const { addCitation } = useStateController();
+    const { addCitation, currentSessionGuid, addPitfall, setPitfallsLoading } = useStateController();
     const editorRef = useRef<HTMLDivElement>(null);
     const [tooltip, setTooltip] = useState<{ top: number, left: number, visible: boolean }>({ top: 0, left: 0, visible: false });
     const [selectedText, setSelectedText] = useState("");
+    const [saving, setSaving] = useState(false);
+    const [saveError, setSaveError] = useState<string | null>(null);
+    const [saveSuccess, setSaveSuccess] = useState(false);
 
     const handleMouseUp = () => {
         const selection = window.getSelection();
@@ -42,8 +46,42 @@ export default function Editor() {
         console.log("handleValueCapture")
     };
 
-    const handleSaveDraft = () => {
-        console.log("handleSaveDraft")
+    const handleSaveDraft = async () => {
+        if (!currentSessionGuid) {
+            setSaveError("Please select a session first");
+            setTimeout(() => setSaveError(null), 3000);
+            return;
+        }
+
+        const draftText = editorRef.current?.innerText || "";
+        if (!draftText.trim()) {
+            setSaveError("Draft is empty");
+            setTimeout(() => setSaveError(null), 3000);
+            return;
+        }
+
+        try {
+            setSaving(true);
+            setSaveError(null);
+            setSaveSuccess(false);
+            setPitfallsLoading(true);
+
+            const pitfallData = await InferenceService.triggerPitfall({
+                draft_paper: draftText,
+                session_guid: currentSessionGuid,
+            });
+
+            addPitfall(pitfallData);
+            setSaveSuccess(true);
+            setTimeout(() => setSaveSuccess(false), 3000);
+        } catch (error) {
+            console.error("Error saving draft:", error);
+            setSaveError("Failed to analyze draft");
+            setTimeout(() => setSaveError(null), 3000);
+        } finally {
+            setSaving(false);
+            setPitfallsLoading(false);
+        }
     };
 
     const formatDoc = (command: string, value?: string) => {
@@ -58,9 +96,19 @@ export default function Editor() {
                 <div className="flex items-center gap-2">
                     <button
                         onClick={() => handleSaveDraft()}
-                        className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                        disabled={saving}
+                        className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="Save Draft">
-                        <FaSave /> Save Draft
+                        {saving ? (
+                            <>
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                Analyzing...
+                            </>
+                        ) : (
+                            <>
+                                <FaSave /> Save Draft
+                            </>
+                        )}
                     </button>
                     <button
                         onClick={() => handleValueCapture()}
@@ -70,6 +118,18 @@ export default function Editor() {
                     </button>
                 </div>
             </div>
+            
+            {/* Success/Error Messages */}
+            {saveSuccess && (
+                <div className="mb-3 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700">
+                    Draft analyzed successfully!
+                </div>
+            )}
+            {saveError && (
+                <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700">
+                    {saveError}
+                </div>
+            )}
             <div className="bg-white rounded-xl shadow-lg flex-grow flex flex-col border border-gray-200">
                 <div className="border-b border-gray-200 p-3 flex items-center gap-2 flex-wrap">
                     <button

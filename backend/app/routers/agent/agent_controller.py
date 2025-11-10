@@ -4,6 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.config.db_config import get_db
 from app.models.knowledge_graph.api_dto import CitationDto, PitfallDto
 from app.models.knowledge_graph.agent_response import ResearchCoachResponse
+from app.models.pitfall.ps_pitfall import PSPitfallCreate, PSPitfall
+from app.services.pitfall.pitfall_service import PitfallService
 from app.agents.section_classifier_agent import SectionClassifierAgent
 from app.agents.research_coach_agent import ResearchCoachAgent
 from app.agents.contribution_clarification_agent import ContributionClarificationAgent
@@ -28,7 +30,7 @@ async def citation_search(
     return "Endpoint to trigger the citation agent"
 
 
-@router.post("/pitfall-analysis")
+@router.post("/pitfall-analysis", response_model=PSPitfall)
 async def search_for_pitfalls(
     draft_text: PitfallDto,
     dbConn: AsyncSession = Depends(get_db)
@@ -41,6 +43,7 @@ async def search_for_pitfalls(
     2.  **Research Coach AI Agent**: Uses the output of the first agent to
         conditionally run various analysis modes (Novelty, Methodology, etc.)
         to detect research pitfalls and assess significance.
+    3.  **Saves the analysis**: Stores the pitfall analysis in the database.
     """
     # Step 1: Trigger the Section Classifier Agent to understand the draft's structure.
     section_classifier = SectionClassifierAgent(name="section_classifier_agent", kg_helper_service=KGHelperService())
@@ -51,7 +54,20 @@ async def search_for_pitfalls(
     research_coach = ResearchCoachAgent(db=dbConn, name="research_coach_agent")
     final_analysis = await research_coach.analyze_draft(classification_response)
     
-    return final_analysis
+    # Step 3: Create a pitfall record in the database
+    pitfall_service = PitfallService()
+    pitfall_create = PSPitfallCreate(
+        session_guid=draft_text.session_guid,
+        draft_text=final_analysis.draft_text,
+        novelty_analysis=final_analysis.novelty_analysis,
+        methodology_analysis=final_analysis.methodology_analysis,
+        significance_analysis=final_analysis.significance_analysis,
+        contradiction_alerts=final_analysis.contradiction_alerts
+    )
+    
+    pitfall_record = await pitfall_service.create_pitfall(db=dbConn, pitfall=pitfall_create)
+    
+    return pitfall_record
 
 
 @router.post("/significance-clarification")
