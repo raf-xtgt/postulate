@@ -40,6 +40,13 @@ interface StateControllerState {
   citationResultsLoading: boolean;
   setCitationResultsLoading: (loading: boolean) => void;
 
+  // significance analyses
+  significanceAnalyses: any[];
+  setSignificanceAnalyses: (analyses: any[]) => void;
+  addSignificanceAnalysis: (analysis: any) => void;
+  significanceAnalysesLoading: boolean;
+  setSignificanceAnalysesLoading: (loading: boolean) => void;
+
 }
 
 const StateControllerContext = createContext<StateControllerState | undefined>(undefined);
@@ -56,6 +63,8 @@ export const StateControllerProvider = ({ children }: { children: ReactNode }) =
   const [pitfallsLoading, setPitfallsLoading] = useState<boolean>(false);
   const [citationResults, setCitationResults] = useState<any[]>([]);
   const [citationResultsLoading, setCitationResultsLoading] = useState<boolean>(false);
+  const [significanceAnalyses, setSignificanceAnalyses] = useState<any[]>([]);
+  const [significanceAnalysesLoading, setSignificanceAnalysesLoading] = useState<boolean>(false);
 
   const addCitation = (citation: CitationModel) => {
     setCitations(prev => [...prev, citation]);
@@ -67,6 +76,10 @@ export const StateControllerProvider = ({ children }: { children: ReactNode }) =
 
   const addCitationResults = (results: any[]) => {
     setCitationResults(prev => [...prev, ...results]);
+  };
+
+  const addSignificanceAnalysis = (analysis: any) => {
+    setSignificanceAnalyses(prev => [...prev, analysis]);
   };
 
   return (
@@ -91,7 +104,12 @@ export const StateControllerProvider = ({ children }: { children: ReactNode }) =
       setCitationResults,
       addCitationResults,
       citationResultsLoading,
-      setCitationResultsLoading
+      setCitationResultsLoading,
+      significanceAnalyses,
+      setSignificanceAnalyses,
+      addSignificanceAnalysis,
+      significanceAnalysesLoading,
+      setSignificanceAnalysesLoading
     }}>
       {children}
     </StateControllerContext.Provider>

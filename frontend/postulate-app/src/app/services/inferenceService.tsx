@@ -33,7 +33,7 @@ export const InferenceService = {
     return await response.json();
   },
 
-  async captureImpactPoints(payload: { query: string; session_guid: string }): Promise<any> {
+  async captureImpactPoints(payload: { draft_paper: string; session_guid: string }): Promise<any> {
     const response = await fetch("http://localhost:8000/ps/agent/significance-clarification", {
       method: "POST",
       headers: {
@@ -43,7 +43,7 @@ export const InferenceService = {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to analyze draft");
+      throw new Error("Failed to capture impact points");
     }
 
     return await response.json();

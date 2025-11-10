@@ -5,7 +5,7 @@ import { FaRobot, FaExclamationTriangle, FaQuoteRight } from "react-icons/fa";
 import { useStateController } from "@/app/context/stateController";
 import Pitfall from "./pitfall/pitfall";
 import Citation from "./citation/citation";
-import PaperImpact from "./impactPoints/paperImpact";
+import PaperSignificance from "./impactPoints/paperSignificance";
 
 
 export default function LlmMain() {
@@ -26,7 +26,7 @@ export default function LlmMain() {
             <FaExclamationTriangle className="text-amber-500 mr-2 text-lg" />
             <h2 className="font-bold text-lg text-gray-800">Contribution Points</h2>
         </div>
-        <PaperImpact></PaperImpact>
+        <PaperSignificance></PaperSignificance>
       </div>
       
     </div>

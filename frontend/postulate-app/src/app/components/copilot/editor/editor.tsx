@@ -7,7 +7,7 @@ import { InferenceService } from '@/app/services/inferenceService';
 import { FaBold, FaSearchengin, FaHighlighter, FaSearch, FaSave } from 'react-icons/fa';
 
 export default function Editor() {
-    const { addCitation, currentSessionGuid, addPitfall, setPitfallsLoading, addCitationResults, setCitationResultsLoading } = useStateController();
+    const { addCitation, currentSessionGuid, addPitfall, setPitfallsLoading, addCitationResults, setCitationResultsLoading, addSignificanceAnalysis, setSignificanceAnalysesLoading } = useStateController();
     const editorRef = useRef<HTMLDivElement>(null);
     const [tooltip, setTooltip] = useState<{ top: number, left: number, visible: boolean }>({ top: 0, left: 0, visible: false });
     const [selectedText, setSelectedText] = useState("");
@@ -68,8 +68,42 @@ export default function Editor() {
         }
     };
 
-    const handleValueCapture = () => {
-        console.log("handleValueCapture")
+    const handleValueCapture = async () => {
+        if (!currentSessionGuid) {
+            setSaveError("Please select a session first");
+            setTimeout(() => setSaveError(null), 3000);
+            return;
+        }
+
+        const draftText = editorRef.current?.innerText || "";
+        if (!draftText.trim()) {
+            setSaveError("Draft is empty");
+            setTimeout(() => setSaveError(null), 3000);
+            return;
+        }
+
+        try {
+            setSaving(true);
+            setSaveError(null);
+            setSaveSuccess(false);
+            setSignificanceAnalysesLoading(true);
+
+            const significanceData = await InferenceService.captureImpactPoints({
+                draft_paper: draftText,
+                session_guid: currentSessionGuid,
+            });
+
+            addSignificanceAnalysis(significanceData);
+            setSaveSuccess(true);
+            setTimeout(() => setSaveSuccess(false), 3000);
+        } catch (error) {
+            console.error("Error capturing impact points:", error);
+            setSaveError("Failed to capture impact points");
+            setTimeout(() => setSaveError(null), 3000);
+        } finally {
+            setSaving(false);
+            setSignificanceAnalysesLoading(false);
+        }
     };
 
     const handleSaveDraft = async () => {
