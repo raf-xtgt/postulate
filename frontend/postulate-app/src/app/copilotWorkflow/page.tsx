@@ -13,12 +13,12 @@ export default function CopilotWorkflow() {
       </div>
       <div className="flex flex-col lg:flex-row gap-5 h-[calc(100%-6rem)]">
         {/* Session Sidebar */}
-        <div className="w-full lg:w-1/4 bg-white rounded-2xl shadow-lg p-1 border border-gray-200">
-          <SessionListing></SessionListing>  
+        <div className="w-full lg:w-1/5 bg-white rounded-2xl shadow-lg p-1 border border-gray-200">
+          <SessionListing></SessionListing>
         </div>
-        
+
         {/* Main Editor Area */}
-        <div className="hidden lg:block w-2/4 bg-white rounded-2xl shadow-lg p-1 border border-gray-200">
+        <div className="hidden lg:block w-2/5 bg-white rounded-2xl shadow-lg p-1 border border-gray-200">
           <Editor />
         </div>
 
@@ -29,9 +29,9 @@ export default function CopilotWorkflow() {
             <p className="text-gray-500">Available on larger screens</p>
           </div>
         </div>
-        
+
         {/* AI Insights Panel */}
-        <div className="hidden lg:block w-1/4 bg-white rounded-2xl shadow-lg p-1 border border-gray-200">
+        <div className="hidden lg:block w-2/5 bg-white rounded-2xl shadow-lg p-1 border border-gray-200">
           <div className="p-4 pb-2">
             <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
               <span className="bg-indigo-100 text-indigo-800 p-2 rounded-lg">
@@ -42,7 +42,7 @@ export default function CopilotWorkflow() {
           </div>
           <LlmMain></LlmMain>
         </div>
-        
+
       </div>
     </div>
   );
