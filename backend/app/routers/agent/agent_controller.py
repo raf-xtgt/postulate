@@ -59,7 +59,7 @@ async def search_for_significance_clarification(
     draft_text: PitfallDto,
     dbConn: AsyncSession = Depends(get_db)
 ):
-    research_coach = ContributionClarificationAgent(db=dbConn, name="contribution_clarification_agent")
-    final_analysis = await research_coach.analyze_draft(draft_text.draft_paper)
+    contiribution_agent = ContributionClarificationAgent(db=dbConn, name="contribution_clarification_agent")
+    final_analysis = await contiribution_agent.analyze_draft(draft_text.draft_paper)
     
     return final_analysis
