@@ -8,6 +8,9 @@ from .routers import file_upload
 from .routers.knowledge_graph import knowledge_graph_controller
 from .routers.agent import agent_controller
 from .routers.pitfall import pitfall_controller
+from .routers.citation import citation_result_controller
+from .routers.significance import significance_analysis_controller
+
 
 load_dotenv()
 
@@ -44,6 +47,8 @@ app.include_router(file_upload.router, prefix=url_prefix)
 app.include_router(knowledge_graph_controller.router, prefix=url_prefix)
 app.include_router(agent_controller.router, prefix=url_prefix)
 app.include_router(pitfall_controller.router, prefix=url_prefix)
+app.include_router(citation_result_controller.router, prefix=url_prefix)
+app.include_router(significance_analysis_controller.router, prefix=url_prefix)
 
 
 # A simple root endpoint

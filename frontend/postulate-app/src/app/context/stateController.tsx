@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { ChatMessage } from '../models/chatMsg';
 import { CitationModel } from '../models/citation';
 
@@ -81,6 +81,46 @@ export const StateControllerProvider = ({ children }: { children: ReactNode }) =
   const addSignificanceAnalysis = (analysis: any) => {
     setSignificanceAnalyses(prev => [...prev, analysis]);
   };
+
+  // Load session data when currentSessionGuid changes
+  useEffect(() => {
+    const loadSessionData = async () => {
+      if (!currentSessionGuid) {
+        // Clear all data when no session is selected
+        setPitfalls([]);
+        setCitationResults([]);
+        setSignificanceAnalyses([]);
+        return;
+      }
+
+      try {
+        // Load pitfalls
+        const pitfallsResponse = await fetch(`http://localhost:8000/ps/pitfall/session/${currentSessionGuid}`);
+        if (pitfallsResponse.ok) {
+          const pitfallsData = await pitfallsResponse.json();
+          setPitfalls(pitfallsData);
+        }
+
+        // Load citation results
+        const citationsResponse = await fetch(`http://localhost:8000/ps/citation/session/${currentSessionGuid}`);
+        if (citationsResponse.ok) {
+          const citationsData = await citationsResponse.json();
+          setCitationResults(citationsData);
+        }
+
+        // Load significance analyses
+        const significanceResponse = await fetch(`http://localhost:8000/ps/significance-analysis/session/${currentSessionGuid}`);
+        if (significanceResponse.ok) {
+          const significanceData = await significanceResponse.json();
+          setSignificanceAnalyses(significanceData);
+        }
+      } catch (error) {
+        console.error('Error loading session data:', error);
+      }
+    };
+
+    loadSessionData();
+  }, [currentSessionGuid]);
 
   return (
     <StateControllerContext.Provider value={{
