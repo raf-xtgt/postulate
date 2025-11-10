@@ -3,9 +3,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.db_config import get_db
 from app.models.knowledge_graph.api_dto import CitationDto, PitfallDto
-from app.models.knowledge_graph.agent_response import ResearchCoachResponse
+from app.models.knowledge_graph.agent_response import ResearchCoachResponse, SignificanceAnalysis
 from app.models.pitfall.ps_pitfall import PSPitfallCreate, PSPitfall
+from app.models.significance.ps_significance_analysis import PSSignificanceAnalysisCreate, PSSignificanceAnalysis
 from app.services.pitfall.pitfall_service import PitfallService
+from app.services.significance.significance_analysis_service import SignificanceAnalysisService
 from app.agents.section_classifier_agent import SectionClassifierAgent
 from app.agents.research_coach_agent import ResearchCoachAgent
 from app.agents.contribution_clarification_agent import ContributionClarificationAgent
@@ -70,12 +72,65 @@ async def search_for_pitfalls(
     return pitfall_record
 
 
-@router.post("/significance-clarification")
+@router.post("/significance-clarification", response_model=PSSignificanceAnalysis)
 async def search_for_significance_clarification(
     draft_text: PitfallDto,
     dbConn: AsyncSession = Depends(get_db)
 ):
-    contiribution_agent = ContributionClarificationAgent(db=dbConn, name="contribution_clarification_agent")
-    final_analysis = await contiribution_agent.analyze_draft(draft_text.draft_paper)
+    """
+    Triggers the significance clarification agent to analyze research contribution.
     
-    return final_analysis
+    This endpoint:
+    1. Runs the Contribution Clarification Agent to assess significance
+    2. Stores the significance analysis in the database
+    3. Returns the created significance analysis record
+    """
+    # Step 1: Run the Contribution Clarification Agent
+    contribution_agent = ContributionClarificationAgent(db=dbConn, name="contribution_clarification_agent")
+    final_analysis = await contribution_agent.analyze_draft(draft_text.draft_paper)
+    
+    # Step 2: Extract significance analysis from the result
+    significance_data = final_analysis.get("significance")
+    
+    # Step 3: Create a significance analysis record in the database
+    significance_service = SignificanceAnalysisService()
+    
+    # Parse the significance data
+    if significance_data:
+        if isinstance(significance_data, SignificanceAnalysis):
+            significance_create = PSSignificanceAnalysisCreate(
+                session_guid=draft_text.session_guid,
+                status=significance_data.status,
+                significance=significance_data.significance,
+                feedback=significance_data.feedback
+            )
+        elif isinstance(significance_data, dict):
+            significance_create = PSSignificanceAnalysisCreate(
+                session_guid=draft_text.session_guid,
+                status=significance_data.get("status"),
+                significance=significance_data.get("significance"),
+                feedback=significance_data.get("feedback")
+            )
+        else:
+            # Fallback if data format is unexpected
+            significance_create = PSSignificanceAnalysisCreate(
+                session_guid=draft_text.session_guid,
+                status=None,
+                significance=None,
+                feedback=None
+            )
+    else:
+        # No significance data returned
+        significance_create = PSSignificanceAnalysisCreate(
+            session_guid=draft_text.session_guid,
+            status=None,
+            significance=None,
+            feedback=None
+        )
+    
+    significance_record = await significance_service.create_significance_analysis(
+        db=dbConn, 
+        significance_analysis=significance_create
+    )
+    
+    return significance_record
