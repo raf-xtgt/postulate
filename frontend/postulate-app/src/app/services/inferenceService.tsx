@@ -16,4 +16,21 @@ export const InferenceService = {
     return await response.json();
   },
 
+
+  async searchCitation(payload: { text: string; session_guid: string }): Promise<any> {
+    const response = await fetch("http://localhost:8000/ps/agent/pitfall-analysis", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to analyze draft");
+    }
+
+    return await response.json();
+  },
+
 }
