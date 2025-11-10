@@ -55,17 +55,18 @@ export default function PitfallCard({ pitfall }: Props) {
             {/* Novelty Section */}
             {pitfall.novelty_analysis && (
               <div className="p-4 bg-white rounded-lg border border-gray-200">
-                <div className="flex items-center gap-2 mb-3">
-                  <FaStar className="text-amber-500" />
-                  <h4 className="font-bold text-gray-800">Novelty</h4>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <FaStar className="text-amber-500" />
+                    <h4 className="font-bold text-gray-800">Novelty</h4>
                     <span className={`text-lg font-bold ${getScoreColor(pitfall.novelty_analysis.score)}`}>
                       {(pitfall.novelty_analysis.score * 10).toFixed(1)}/10
                     </span>
-                    <p className="text-gray-700 text-sm flex-1">{pitfall.novelty_analysis.feedback}</p>
                   </div>
+                  
+                </div>
+                <div className="space-y-2">
+                  <p className="text-gray-700 text-sm">{pitfall.novelty_analysis.feedback}</p>
                   {pitfall.novelty_analysis.supporting_claim_text && (
                     <div className="mt-2 p-2 bg-gray-50 rounded text-xs text-gray-600 italic">
                       "{pitfall.novelty_analysis.supporting_claim_text}"
@@ -78,17 +79,17 @@ export default function PitfallCard({ pitfall }: Props) {
             {/* Significance Section */}
             {pitfall.significance_analysis && (
               <div className="p-4 bg-white rounded-lg border border-gray-200">
-                <div className="flex items-center gap-2 mb-3">
-                  <FaChartBar className="text-blue-500" />
-                  <h4 className="font-bold text-gray-800">Significance</h4>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <FaChartBar className="text-blue-500" />
+                    <h4 className="font-bold text-gray-800">Significance</h4>
                     <span className={`text-lg font-bold ${getStatusColor(pitfall.significance_analysis.status)}`}>
                       {pitfall.significance_analysis.status || 'N/A'}
                     </span>
-                    <p className="text-gray-700 text-sm flex-1">{pitfall.significance_analysis.significance}</p>
                   </div>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-gray-700 text-sm">{pitfall.significance_analysis.significance}</p>
                   {pitfall.significance_analysis.feedback && pitfall.significance_analysis.feedback.length > 0 && (
                     <ul className="mt-2 space-y-1 text-sm text-gray-600">
                       {pitfall.significance_analysis.feedback.map((item, idx) => (
@@ -106,17 +107,17 @@ export default function PitfallCard({ pitfall }: Props) {
             {/* Methodology Section */}
             {pitfall.methodology_analysis && (
               <div className="p-4 bg-white rounded-lg border border-gray-200">
-                <div className="flex items-center gap-2 mb-3">
-                  <FaProjectDiagram className="text-purple-500" />
-                  <h4 className="font-bold text-gray-800">Methodology</h4>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <FaProjectDiagram className="text-purple-500" />
+                    <h4 className="font-bold text-gray-800">Methodology</h4>
                     <span className={`text-lg font-bold ${getStatusColor(pitfall.methodology_analysis.status)}`}>
                       {pitfall.methodology_analysis.status || 'N/A'}
                     </span>
-                    <p className="text-gray-700 text-sm flex-1">{pitfall.methodology_analysis.feedback}</p>
                   </div>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-gray-700 text-sm">{pitfall.methodology_analysis.feedback}</p>
                   {pitfall.methodology_analysis.method_text && (
                     <div className="mt-2 p-2 bg-gray-50 rounded text-xs text-gray-600">
                       <strong>Method:</strong> {pitfall.methodology_analysis.method_text}
