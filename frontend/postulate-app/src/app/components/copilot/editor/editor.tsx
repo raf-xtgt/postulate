@@ -7,13 +7,14 @@ import { InferenceService } from '@/app/services/inferenceService';
 import { FaBold, FaSearchengin, FaHighlighter, FaSearch, FaSave } from 'react-icons/fa';
 
 export default function Editor() {
-    const { addCitation, currentSessionGuid, addPitfall, setPitfallsLoading } = useStateController();
+    const { addCitation, currentSessionGuid, addPitfall, setPitfallsLoading, addCitationResults, setCitationResultsLoading } = useStateController();
     const editorRef = useRef<HTMLDivElement>(null);
     const [tooltip, setTooltip] = useState<{ top: number, left: number, visible: boolean }>({ top: 0, left: 0, visible: false });
     const [selectedText, setSelectedText] = useState("");
     const [saving, setSaving] = useState(false);
     const [saveError, setSaveError] = useState<string | null>(null);
     const [saveSuccess, setSaveSuccess] = useState(false);
+    const [searchingCitations, setSearchingCitations] = useState(false);
 
     const handleMouseUp = () => {
         const selection = window.getSelection();
@@ -31,15 +32,40 @@ export default function Editor() {
         }
     };
 
-    const handleSearchCitations = () => {
-        const newCitation: CitationModel = {
-            guid: `cit-${Date.now()}`,
-            title: selectedText,
-            source: 'From Editor',
-            created_date: new Date().toISOString()
-        };
-        addCitation(newCitation);
-        setTooltip({ ...tooltip, visible: false });
+    const handleSearchCitations = async () => {
+        if (!currentSessionGuid) {
+            setSaveError("Please select a session first");
+            setTimeout(() => setSaveError(null), 3000);
+            setTooltip({ ...tooltip, visible: false });
+            return;
+        }
+
+        if (!selectedText.trim()) {
+            setTooltip({ ...tooltip, visible: false });
+            return;
+        }
+
+        try {
+            setSearchingCitations(true);
+            setCitationResultsLoading(true);
+            setTooltip({ ...tooltip, visible: false });
+
+            const citationData = await InferenceService.searchCitation({
+                query: selectedText,
+                session_guid: currentSessionGuid,
+            });
+
+            addCitationResults(citationData);
+            setSaveSuccess(true);
+            setTimeout(() => setSaveSuccess(false), 3000);
+        } catch (error) {
+            console.error("Error searching citations:", error);
+            setSaveError("Failed to search citations");
+            setTimeout(() => setSaveError(null), 3000);
+        } finally {
+            setSearchingCitations(false);
+            setCitationResultsLoading(false);
+        }
     };
 
     const handleValueCapture = () => {
@@ -184,13 +210,22 @@ export default function Editor() {
                         className="fixed bg-indigo-600 text-white text-sm rounded-lg py-2 px-3 z-50 shadow-lg flex items-center gap-2 transition-all duration-200"
                         style={{ top: tooltip.top, left: tooltip.left }}
                     >
-                        <FaSearch className="text-white" />
-                        <button
-                            onClick={handleSearchCitations}
-                            className="font-medium hover:underline"
-                        >
-                            Search Citations
-                        </button>
+                        {searchingCitations ? (
+                            <>
+                                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                                <span className="font-medium">Searching...</span>
+                            </>
+                        ) : (
+                            <>
+                                <FaSearch className="text-white" />
+                                <button
+                                    onClick={handleSearchCitations}
+                                    className="font-medium hover:underline"
+                                >
+                                    Search Citations
+                                </button>
+                            </>
+                        )}
                     </div>
                 )}
             </div>

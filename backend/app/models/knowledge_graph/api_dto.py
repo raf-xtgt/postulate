@@ -4,6 +4,7 @@ import uuid
 
 class KGSearchQuery(BaseModel):
     query: str
+    session_guid: uuid.UUID
 
 
 class CitationDto(BaseModel):

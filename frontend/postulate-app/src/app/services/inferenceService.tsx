@@ -17,8 +17,8 @@ export const InferenceService = {
   },
 
 
-  async searchCitation(payload: { text: string; session_guid: string }): Promise<any> {
-    const response = await fetch("http://localhost:8000/ps/agent/pitfall-analysis", {
+  async searchCitation(payload: { query: string; session_guid: string }): Promise<any> {
+    const response = await fetch("http://localhost:8000/ps/kg/citation-search", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

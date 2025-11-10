@@ -33,6 +33,13 @@ interface StateControllerState {
   pitfallsLoading: boolean;
   setPitfallsLoading: (loading: boolean) => void;
 
+  // citation results
+  citationResults: any[];
+  setCitationResults: (results: any[]) => void;
+  addCitationResults: (results: any[]) => void;
+  citationResultsLoading: boolean;
+  setCitationResultsLoading: (loading: boolean) => void;
+
 }
 
 const StateControllerContext = createContext<StateControllerState | undefined>(undefined);
@@ -47,6 +54,8 @@ export const StateControllerProvider = ({ children }: { children: ReactNode }) =
   const [currentSessionGuid, setCurrentSessionGuid] = useState<string | null>(null);
   const [pitfalls, setPitfalls] = useState<any[]>([]);
   const [pitfallsLoading, setPitfallsLoading] = useState<boolean>(false);
+  const [citationResults, setCitationResults] = useState<any[]>([]);
+  const [citationResultsLoading, setCitationResultsLoading] = useState<boolean>(false);
 
   const addCitation = (citation: CitationModel) => {
     setCitations(prev => [...prev, citation]);
@@ -54,6 +63,10 @@ export const StateControllerProvider = ({ children }: { children: ReactNode }) =
 
   const addPitfall = (pitfall: any) => {
     setPitfalls(prev => [...prev, pitfall]);
+  };
+
+  const addCitationResults = (results: any[]) => {
+    setCitationResults(prev => [...prev, ...results]);
   };
 
   return (
@@ -73,7 +86,12 @@ export const StateControllerProvider = ({ children }: { children: ReactNode }) =
       setPitfalls,
       addPitfall,
       pitfallsLoading,
-      setPitfallsLoading
+      setPitfallsLoading,
+      citationResults,
+      setCitationResults,
+      addCitationResults,
+      citationResultsLoading,
+      setCitationResultsLoading
     }}>
       {children}
     </StateControllerContext.Provider>
