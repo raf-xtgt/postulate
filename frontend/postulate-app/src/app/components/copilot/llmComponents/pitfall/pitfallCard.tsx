@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { FaChevronDown, FaChevronUp, FaStar, FaChartBar, FaProjectDiagram, FaExclamationTriangle } from "react-icons/fa";
 import { PitfallModel } from "@/app/models/pitfall";
+import ContradictionListing from "./contradictionListing";
 
 interface Props {
   pitfall: PitfallModel;
@@ -63,7 +64,7 @@ export default function PitfallCard({ pitfall }: Props) {
                       {(pitfall.novelty_analysis.score * 10).toFixed(1)}/10
                     </span>
                   </div>
-                  
+
                 </div>
                 <div className="space-y-2">
                   <p className="text-gray-700 text-sm">{pitfall.novelty_analysis.feedback}</p>
@@ -133,42 +134,7 @@ export default function PitfallCard({ pitfall }: Props) {
             )}
 
             {/* Contradictions Section */}
-            {pitfall.contradiction_alerts && pitfall.contradiction_alerts.contradictions.length > 0 && (
-              <div className="p-4 bg-white rounded-lg border border-gray-200">
-                <div className="flex items-center gap-2 mb-3">
-                  <FaExclamationTriangle className="text-red-500" />
-                  <h4 className="font-bold text-gray-800">Contradictions</h4>
-                </div>
-                <div className="space-y-3">
-                  {pitfall.contradiction_alerts.contradictions.map((contradiction, idx) => (
-                    <div key={idx} className="p-3 bg-red-50 rounded-lg border border-red-200">
-                      <p className="text-sm text-gray-700 mb-2">{contradiction.feedback}</p>
-                      {contradiction.draft_finding && (
-                        <div className="text-xs text-gray-600 mb-1">
-                          <strong>Your finding:</strong> {contradiction.draft_finding}
-                        </div>
-                      )}
-                      {contradiction.corpus_finding && (
-                        <div className="text-xs text-gray-600">
-                          <strong>Contradicts ({contradiction.corpus_paper_id}):</strong> {contradiction.corpus_finding}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* No Contradictions */}
-            {(!pitfall.contradiction_alerts || pitfall.contradiction_alerts.contradictions.length === 0) && (
-              <div className="p-4 bg-white rounded-lg border border-gray-200">
-                <div className="flex items-center gap-2 mb-3">
-                  <FaExclamationTriangle className="text-green-500" />
-                  <h4 className="font-bold text-gray-800">Contradictions</h4>
-                </div>
-                <p className="text-green-600 font-medium">No contradictions found</p>
-              </div>
-            )}
+            <ContradictionListing contradictionAlerts={pitfall.contradiction_alerts} />
           </div>
         </div>
       )}
