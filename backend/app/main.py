@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 import os
 from fastapi.middleware.cors import CORSMiddleware
 import vertexai
-from .routers import finance
 from .routers import session
 from .routers import file_upload
 from .routers.knowledge_graph import knowledge_graph_controller
@@ -40,7 +39,6 @@ app.add_middleware(
 
 
 url_prefix = "/ps"
-app.include_router(finance.router, prefix=url_prefix)
 app.include_router(session.router, prefix=url_prefix)
 app.include_router(file_upload.router, prefix=url_prefix)
 app.include_router(knowledge_graph_controller.router, prefix=url_prefix)
