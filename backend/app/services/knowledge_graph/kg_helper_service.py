@@ -6,6 +6,7 @@ from app.services.file_upload.file_upload_service import FileUploadService
 from app.config.storage_config import bucket
 from app.models.knowledge_graph.graph_extraction import KnowledgeGraph, Entity, Relationship 
 from app.models.knowledge_graph.paper_segement import *
+from app.models.knowledge_graph.citation_search_dto import (RelatedEntity, ContextSummary)
 from app.models.knowledge_graph.ps_kg_entity import PSKgEntityCreate, PSKgEntityDB
 from app.models.knowledge_graph.ps_kg_relationship import PSKgRelationshipCreate, PSKgRelationshipDB
 from pypdf import PdfReader
@@ -18,6 +19,11 @@ from pydantic import BaseModel
 
 EMBEDDING_MODEL_NAME = "text-embedding-004" 
 embedding_model = TextEmbeddingModel.from_pretrained(EMBEDDING_MODEL_NAME)
+
+
+class ContextSummary(BaseModel):
+    """Model for LLM-generated context summary connecting related entities."""
+    summary: str
 
 class KGHelperService:
     def __init__(self):
@@ -169,3 +175,47 @@ class KGHelperService:
         db_rel = PSKgRelationshipDB(**new_rel.dict())
         db.add(db_rel)
         # We will commit at the end of process_file_content
+
+    async def connect_related_entities(self, paragraph_text: str, related_entities: list[RelatedEntity]) -> str:
+        """
+        Uses LLM to synthesize related entities into a single contextual sentence.
+        
+        Args:
+            paragraph_text: The context paragraph text
+            related_entities: List of related entities with their types and relationships
+            
+        Returns:
+            A single sentence summarizing how the entities relate to the paragraph
+        """
+        if not related_entities:
+            return ""
+        
+        # Build a structured description of the entities
+        entities_description = []
+        for entity in related_entities:
+            entities_description.append(
+                f"- {entity.relationship_type}: {entity.entity_type} - {entity.content[:200]}"
+            )
+        
+        entities_text = "\n".join(entities_description)
+        
+        prompt = f"""
+        Given the following paragraph from a research paper and its related entities from the knowledge graph,
+        synthesize a single concise sentence that explains how these entities connect to and contextualize the paragraph.
+        
+        Paragraph:
+        {paragraph_text}
+        
+        Related Entities:
+        {entities_text}
+        
+        Create a natural, flowing sentence that integrates the key relationships and entities.
+        Focus on the most important connections (citations, claims, results).
+        """
+        
+        try:
+            result = await self._generate_structured_content(prompt, ContextSummary)
+            return result.summary if result else ""
+        except Exception as e:
+            print(f"Error connecting related entities: {e}")
+            return ""

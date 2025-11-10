@@ -6,12 +6,15 @@ from collections import defaultdict
 from app.models.knowledge_graph.ps_kg_entity import PSKgEntityDB
 from app.models.knowledge_graph.ps_kg_relationship import PSKgRelationshipDB
 from app.models.knowledge_graph.citation_search_dto import CitationResult, RelatedEntity
+from app.services.knowledge_graph.kg_helper_service import KGHelperService
 from vertexai.language_models import TextEmbeddingModel
 
 EMBEDDING_MODEL_NAME = "text-embedding-004"
 embedding_model = TextEmbeddingModel.from_pretrained(EMBEDDING_MODEL_NAME)
 
 class KGCitationSearchService:
+    def __init__(self):
+        self.helper_service = KGHelperService()
 
     async def citation_search(self, query: str, db: AsyncSession, k: int = 3) -> list[CitationResult]:
         """
@@ -89,6 +92,12 @@ class KGCitationSearchService:
         # Step 2.2: Downward Traversal - Find Related Entities
         related_entities = await self._find_related_entities(context_paragraph, db)
         
+        # Step 2.2 (Additional): Connect Related Entities into Context Summary
+        context_summary = await self.helper_service.connect_related_entities(
+            paragraph_text=context_paragraph.content,
+            related_entities=related_entities
+        )
+        
         # Step 3: Result Synthesis
         return CitationResult(
             paper_title=paper_metadata.get("title", "Unknown"),
@@ -97,7 +106,7 @@ class KGCitationSearchService:
             paper_venue=paper_metadata.get("venue", "Unknown"),
             paragraph_text=context_paragraph.content,
             relevance_score=relevance_score,
-            related_entities=related_entities
+            context_summary=context_summary
         )
 
     async def _find_context_paragraph(self, seed_node: PSKgEntityDB, db: AsyncSession) -> PSKgEntityDB | None:

@@ -63,7 +63,11 @@ class CitationResult(BaseModel):
         ...,
         description="Relevance score for this result (higher values indicate better matches)"
     )
-    related_entities: List[RelatedEntity] = Field(
-        default_factory=list,
-        description="List of related entities discovered through knowledge graph traversal"
+    context_summary: str = Field(
+        default="",
+        description="A single sentence summarizing how the related entities connect to the paragraph context"
     )
+
+class ContextSummary(BaseModel):
+    """Model for LLM-generated context summary connecting related entities."""
+    summary: str
