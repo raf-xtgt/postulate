@@ -57,7 +57,7 @@ export default function SessionListing() {
 
       const payload = {
         title: session.title,
-        description: session.description,
+        description: "",
         user_guid: user?.guid
       };
       const createdSession = await SessionService.sessionCreate(payload);
