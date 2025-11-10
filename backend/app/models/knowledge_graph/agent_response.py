@@ -3,6 +3,7 @@ from typing import List, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict
 from typing import Dict, Any
+from app.models.knowledge_graph.agent_response import *
 
 ## Section Presence Helper Model
 class SectionsPresent(BaseModel):
@@ -96,6 +97,10 @@ class ContradictionAnalysis(BaseModel):
         }
     )
 
+class ContradictionListResponse(BaseModel):
+    """A Pydantic model for a list of contradiction analyses."""
+    contradictions: List[ContradictionAnalysis]
+
 class SignificanceAnalysis(BaseModel):
     """Assesses whether the paper's 'why this matters' (contribution) is clearly stated."""
     status: None | str
@@ -120,37 +125,8 @@ class ResearchCoachResponse(BaseModel):
     The complete analysis report from the Research Coach AI Agent.
     This report identifies research pitfalls and assesses the draft's overall contribution.
     """
-    
-    # This field links the analysis to the specific input draft
-    draft_text: str = Field(
-        ...,
-        description="The full draft text that was analyzed by the agent."
-    )
-
-    # The four analysis modes, matching the spec
-    novelty_analysis: NoveltyAnalysis = Field(
-        ...,
-        description="Analysis of the draft's novelty compared to the corpus."
-    )
-    
-    methodology_analysis: Optional[MethodologyAnalysisOutput] = Field(
-        None,
-        description="Analysis of method-claim alignment. Null if 'has_methodology' was false."
-    )
-    
-    significance_analysis: Optional[SignificanceAnalysis] = Field(
-        ...,
-        description="Analysis of the draft's contribution and 'why it matters'."
-    )
-    
-    contradiction_alerts: List[ContradictionAnalysis] = Field(
-        default_factory=list,
-        description="A list of specific contradictions found. Empty if 'has_results' was false or no contradictions were detected."
-    )
-    
-    model_config = ConfigDict(
-        json_schema_extra={
-            'title': 'Research Coach Agent Response',
-            'description': "A comprehensive pitfall and contribution analysis for a research draft."
-        }
-    )
+    draft_text:  None | str 
+    novelty_analysis: None | NoveltyAnalysis
+    methodology_analysis: None | MethodologyAnalysisOutput
+    significance_analysis:  None | SignificanceAnalysis
+    contradiction_alerts: None | ContradictionListResponse 

@@ -9,6 +9,7 @@ from app.models.knowledge_graph.agent_response import (
     MethodologyAnalysis,
     SignificanceAnalysis,
     ContradictionAnalysis,
+    ContradictionListResponse,
     MethodologyAnalysisOutput
 )
 from app.models.knowledge_graph.agent_dto import *

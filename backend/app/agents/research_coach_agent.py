@@ -43,12 +43,7 @@ class ResearchCoachAgent(Agent):
         
         tasks = {
             "novelty": await novelty_analyzer(draft_text=draft_text, db=self.db),
-            # "significance": await significance_analyzer(draft_text=draft_text, db=self.db)
-
         }
-        print("\n novelty and significance \n")
-        print(tasks)
-
 
         # Conditionally add methodology analysis to the task list
         if sections.has_methodology:
@@ -57,8 +52,7 @@ class ResearchCoachAgent(Agent):
         if sections.has_results:
             tasks["contradictions"] =await contradiction_detector(draft_text=draft_text, db=self.db)
 
-        print("\n contradiction \n")
+        print("\n tasks \n")
         print(tasks)
-
         
         return tasks

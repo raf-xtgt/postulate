@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { FaPlus, FaSearch, FaFolderOpen, FaClock } from 'react-icons/fa';
+import { FaPlus, FaSearch, FaFolderOpen, FaClock, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
 import { SessionModel } from '@/app/models/session';
 import { SessionService } from '@/app/services/sessionService';
 import { useUser } from '@/app/context/userContext';
+import { useStateController } from '@/app/context/stateController';
 import AddSession from './addSession';
 import LibraryListing from '../library/libraryListing';
 
@@ -16,8 +17,10 @@ export default function SessionListing() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const { user } = useUser(); // Get user from context
+  const { user } = useUser();
+  const { setCurrentSessionGuid } = useStateController();
 
   // Load Sessions on component mount
   useEffect(() => {
@@ -47,10 +50,13 @@ export default function SessionListing() {
   const handleAddSession = async (session: SessionModel) => {
     try {
       setLoading(true);
+      setError(null);
+      setSuccessMessage(null);
+      
       const payload = {
         title: session.title,
         description: session.description,
-        user_guid: user?.guid // Pass user_guid to the service
+        user_guid: user?.guid
       };
       const createdSession = await SessionService.sessionCreate(payload);
 
@@ -58,6 +64,11 @@ export default function SessionListing() {
         setError(createdSession.error);
       } else {
         setSessions(prev => [...prev, createdSession]);
+        setCurrentSessionGuid(createdSession.guid);
+        setSuccessMessage('Session created successfully!');
+        
+        // Clear success message after 3 seconds
+        setTimeout(() => setSuccessMessage(null), 3000);
       }
     } catch (err) {
       setError('Failed to create session');
@@ -70,6 +81,7 @@ export default function SessionListing() {
 
   const handleStartSession = async (sessionGuid: string) => {
     console.log("session start", sessionGuid);
+    setCurrentSessionGuid(sessionGuid);
 
   };
 
@@ -79,6 +91,30 @@ export default function SessionListing() {
   return (
     <div className="bg-gray-50 rounded-xl p-4 h-full flex flex-col">
       <div className="h-full flex flex-col">
+        {/* Loading Message */}
+        {loading && (
+          <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center gap-2 text-blue-700">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-700"></div>
+            <span>Processing...</span>
+          </div>
+        )}
+
+        {/* Success Message */}
+        {successMessage && (
+          <div className="mb-3 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2 text-green-700">
+            <FaCheckCircle />
+            <span>{successMessage}</span>
+          </div>
+        )}
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700">
+            <FaExclamationCircle />
+            <span>{error}</span>
+          </div>
+        )}
+
         {/* Channels Section (Sessions Dropdown) */}
         <div className="pb-4 border-b border-gray-200">
           <h2 className="font-bold text-lg mb-3 flex justify-between items-center text-gray-800">

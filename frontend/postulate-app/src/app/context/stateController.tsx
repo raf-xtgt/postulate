@@ -11,15 +11,8 @@ interface NavItem {
 }
 
 interface StateControllerState {
-  sharedData: any;
-  setSharedData: (data: any) => void;
-  chatMessages: ChatMessage[];
-  addChatMessage: (message: ChatMessage) => void;
-  pruneChatMessages: (index: number) => void;
-  replayMessage: string;
-  setReplayMessage: (message: string) => void;
-  replayAltPath: any;
-  setReplayAltPath: (payload: any) => void;
+  sessionData: any;
+  setSessionData: (data: any) => void;
 
   // new
   navItems: NavItem[];
@@ -29,28 +22,22 @@ interface StateControllerState {
   citations: CitationModel[];
   addCitation: (citation: CitationModel) => void;
 
+  // session guid
+  currentSessionGuid: string | null;
+  setCurrentSessionGuid: (guid: string | null) => void;
+
 }
 
 const StateControllerContext = createContext<StateControllerState | undefined>(undefined);
 
 export const StateControllerProvider = ({ children }: { children: ReactNode }) => {
-  const [sharedData, setSharedData] = useState<any>(null);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [replayMessage, setReplayMessage] = useState<string>("");
-  const [replayAltPath, setReplayAltPath] = useState<any>(null);
+  const [sessionData, setSessionData] = useState<any>(null);
 
   //new
   const [navItems, setNavItems] = useState<NavItem[]>([]);
   const [docText, addDocText] = useState<string>("");
   const [citations, setCitations] = useState<CitationModel[]>([]);
-
-  const addChatMessage = (message: ChatMessage) => {
-    setChatMessages(prev => [...prev, message]);
-  };
-
-  const pruneChatMessages = (index: number) => {
-    setChatMessages(prev => prev.slice(0, index + 1));
-  };
+  const [currentSessionGuid, setCurrentSessionGuid] = useState<string | null>(null);
 
   const addCitation = (citation: CitationModel) => {
     setCitations(prev => [...prev, citation]);
@@ -58,23 +45,17 @@ export const StateControllerProvider = ({ children }: { children: ReactNode }) =
 
   return (
     <StateControllerContext.Provider value={{
-      sharedData,
-      setSharedData,
-      chatMessages,
-      addChatMessage,
-      pruneChatMessages,
-      replayMessage,
-      setReplayMessage,
-      replayAltPath,
-      setReplayAltPath,
-
+      sessionData,
+      setSessionData,
       // new
       navItems,
       setNavItems,
       docText,
       addDocText,
       citations,
-      addCitation
+      addCitation,
+      currentSessionGuid,
+      setCurrentSessionGuid
     }}>
       {children}
     </StateControllerContext.Provider>
