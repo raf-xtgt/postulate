@@ -60,7 +60,7 @@ async def search_for_pitfalls(
     pitfall_service = PitfallService()
     pitfall_create = PSPitfallCreate(
         session_guid=draft_text.session_guid,
-        draft_text=final_analysis.draft_text,
+        draft_text=final_analysis.draft_text[:1000],
         novelty_analysis=final_analysis.novelty_analysis,
         methodology_analysis=final_analysis.methodology_analysis,
         significance_analysis=final_analysis.significance_analysis,

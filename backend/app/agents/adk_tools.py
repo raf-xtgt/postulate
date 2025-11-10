@@ -207,7 +207,7 @@ async def contradiction_detector(draft_text: str, db: AsyncSession) -> Contradic
     ---
     {draft_text}
     ---
-    Return a JSON object with a "claims" key containing a list of strings, where each string is a claim.
+    Return a JSON object with a "claims" key containing a list of maximum 5 strings, where each string is a claim.
     """
     claims_response = await kg_helper_service._generate_structured_content(
         extraction_prompt, 

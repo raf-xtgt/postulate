@@ -203,7 +203,7 @@ export default function Editor() {
                     {saveError}
                 </div>
             )}
-            <div className="bg-white rounded-xl shadow-lg flex-grow flex flex-col border border-gray-200">
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 flex flex-col">
                 <div className="border-b border-gray-200 p-3 flex items-center gap-2 flex-wrap">
                     <button
                         onClick={() => formatDoc('bold')}
@@ -247,7 +247,7 @@ export default function Editor() {
                     ref={editorRef}
                     contentEditable={true}
                     onMouseUp={handleMouseUp}
-                    className="flex-grow p-4 focus:outline-none min-h-[300px] text-gray-700 leading-relaxed"
+                    className="p-4 focus:outline-none h-[500px] text-gray-700 leading-relaxed overflow-y-auto"
                     suppressContentEditableWarning={true}
                 >
 
