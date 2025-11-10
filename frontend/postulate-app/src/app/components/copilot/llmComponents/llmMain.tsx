@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { FaRobot, FaExclamationTriangle, FaStar } from "react-icons/fa";
 import { useStateController } from "@/app/context/stateController";
 import Pitfall from "./pitfall/pitfall";
-import Citation from "./citation/citation";
 import PaperSignificance from "./impactPoints/paperSignificance";
 
 

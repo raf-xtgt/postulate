@@ -1,6 +1,5 @@
 "use client";
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { ChatMessage } from '../models/chatMsg';
 import { CitationModel } from '../models/citation';
 
 interface NavItem {

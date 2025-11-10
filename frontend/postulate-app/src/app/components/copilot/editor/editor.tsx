@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useStateController } from '@/app/context/stateController';
 import { CitationModel } from '@/app/models/citation';
 import { InferenceService } from '@/app/services/inferenceService';
 import { FaBold, FaSearchengin, FaHighlighter, FaSearch, FaSave } from 'react-icons/fa';
 
 export default function Editor() {
-    const { addCitation, currentSessionGuid, addPitfall, setPitfallsLoading, addCitationResults, setCitationResultsLoading, addSignificanceAnalysis, setSignificanceAnalysesLoading } = useStateController();
+    const { addCitation, currentSessionGuid, addPitfall, setPitfallsLoading, addCitationResults, setCitationResultsLoading, addSignificanceAnalysis, setSignificanceAnalysesLoading, pitfalls } = useStateController();
     const editorRef = useRef<HTMLDivElement>(null);
     const [tooltip, setTooltip] = useState<{ top: number, left: number, visible: boolean }>({ top: 0, left: 0, visible: false });
     const [selectedText, setSelectedText] = useState("");
@@ -148,6 +148,19 @@ export default function Editor() {
         document.execCommand(command, false, value);
         editorRef.current?.focus();
     };
+
+    // Load draft text from first pitfall when session changes
+    useEffect(() => {
+        if (currentSessionGuid && pitfalls.length > 0 && editorRef.current) {
+            const firstPitfall = pitfalls[0];
+            if (firstPitfall.draft_text) {
+                editorRef.current.innerText = firstPitfall.draft_text;
+            }
+        } else if (!currentSessionGuid && editorRef.current) {
+            // Clear editor when no session is selected
+            editorRef.current.innerText = '';
+        }
+    }, [currentSessionGuid, pitfalls]);
 
     return (
         <div className="p-4 h-full flex flex-col bg-gray-50 rounded-xl">
